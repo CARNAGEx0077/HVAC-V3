@@ -30,7 +30,8 @@
       nodes: '0 / 0',
       nodesSub: 'Nodes online',
       computerHeat: '0 W',
-      computerHeatSub: 'Total estimated heat',
+      computerHeatLabel: 'COMPUTER HEAT',
+      computerHeatSub: 'Aggregated thermal load',
       outdoorTemp: 'N/A',
       outdoorTempSub: 'Regional outdoor temp'
     },
@@ -45,8 +46,11 @@
       onlineCount: 0,
       totalCount: 0,
       totalHeatWatts: '0 W',
+      totalHeatLabel: 'TOTAL ESTIMATED HEAT',
       avgCpu: 'N/A',
       avgGpu: 'N/A',
+      avgNodeThermalLoad: 'N/A',
+      clusterThermalMode: 'UNAVAILABLE',
       telemetryList: []
     },
     environment: {

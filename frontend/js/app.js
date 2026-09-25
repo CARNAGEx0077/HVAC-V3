@@ -305,6 +305,98 @@
   }
 
   /**
+   * Node Telemetry Polling Manager
+   * Polls GET /api/nodes every 2 seconds
+   */
+  let nodePollingInterval = null;
+
+  async function pollNodesTelemetry() {
+    try {
+      const resp = await fetch('/api/nodes');
+      if (resp.ok) {
+        const data = await resp.json();
+
+        const hasMeasuredPower = data.total_measured_power_watts !== null && data.total_measured_power_watts !== undefined;
+        const heatLabel = hasMeasuredPower ? 'TOTAL MEASURED HEAT' : 'COMPUTER THERMAL LOAD';
+        const heatVal = data.total_heat_watts;
+        const heatSub = hasMeasuredPower ? 'Aggregated physical power dissipation' : 'Cluster computational proxy index';
+
+        setState(s => {
+          const isNodesOnline = data.online_count > 0;
+          const pipeline = s.pipeline.map(p => {
+            if (p.id === 'nodes') {
+              return { ...p, status: isNodesOnline ? 'ONLINE' : (data.total_count > 0 ? 'OFFLINE' : 'OFFLINE') };
+            }
+            return p;
+          });
+
+          return {
+            ...s,
+            system: { ...s.system, status: 'ONLINE', backendConnected: true },
+            pipeline,
+            overviewMetrics: {
+              ...s.overviewMetrics,
+              nodes: `${data.online_count} / ${data.total_count}`,
+              computerHeat: heatVal,
+              computerHeatLabel: heatLabel,
+              computerHeatSub: heatSub
+            },
+            nodes: {
+              onlineCount: data.online_count,
+              totalCount: data.total_count,
+              totalHeatWatts: heatVal,
+              totalHeatLabel: heatLabel,
+              avgCpu: data.avg_cpu,
+              avgGpu: data.avg_gpu,
+              avgNodeThermalLoad: data.avg_node_thermal_load_index_str || 'N/A',
+              clusterThermalMode: data.cluster_thermal_mode || 'UNAVAILABLE',
+              telemetryList: data.nodes || []
+            }
+          };
+        });
+
+        // Targeted DOM updates
+        const curRoute = getCurrentRoute();
+        if (curRoute === '#/nodes') {
+          renderView();
+        } else if (curRoute === '#/') {
+          const elNodesCard = document.getElementById('card-nodes');
+          if (elNodesCard) {
+            const val = elNodesCard.querySelector('.metric-card-value');
+            if (val) val.textContent = `${data.online_count} / ${data.total_count}`;
+          }
+          const elHeatCard = document.getElementById('card-heat');
+          if (elHeatCard) {
+            const labelEl = elHeatCard.querySelector('.metric-card-label');
+            if (labelEl) labelEl.textContent = heatLabel;
+            const val = elHeatCard.querySelector('.metric-card-value');
+            if (val) val.textContent = heatVal;
+            const sub = elHeatCard.querySelector('.metric-card-subtext');
+            if (sub) sub.textContent = heatSub;
+          }
+          const elNodePipeline = document.querySelector('[data-node-id="nodes"]');
+          if (elNodePipeline) {
+            const statusEl = elNodePipeline.querySelector('.pipeline-node-status');
+            if (statusEl) {
+              const isOnline = data.online_count > 0;
+              statusEl.textContent = isOnline ? 'ONLINE' : 'OFFLINE';
+              statusEl.className = `pipeline-node-status ${isOnline ? 'status-online' : 'status-offline'}`;
+            }
+          }
+        }
+      }
+    } catch (err) {
+      // Backend temporarily unreachable during polling
+    }
+  }
+
+  function startNodePolling() {
+    if (nodePollingInterval) clearInterval(nodePollingInterval);
+    pollNodesTelemetry();
+    nodePollingInterval = setInterval(pollNodesTelemetry, 2000);
+  }
+
+  /**
    * Initialize Application
    */
   function init() {
@@ -326,6 +418,9 @@
 
     // Connect real-time telemetry WebSocket
     connectTelemetryWebSocket();
+
+    // Start polling compute node cluster telemetry
+    startNodePolling();
 
     console.info('[HVEAC] Control Center initialized in connected operations mode.');
   }

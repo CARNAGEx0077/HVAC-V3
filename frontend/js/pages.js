@@ -32,7 +32,7 @@
           id: 'card-nodes'
         })}
         ${MetricCard({
-          label: 'COMPUTER HEAT',
+          label: state.overviewMetrics.computerHeatLabel || 'COMPUTER HEAT',
           value: state.overviewMetrics.computerHeat,
           subtext: state.overviewMetrics.computerHeatSub,
           id: 'card-heat'
@@ -127,63 +127,86 @@
    * Cluster compute heat dissipation & hardware telemetry
    */
   function renderNodes(state) {
+    const isMeasured = state.nodes.clusterThermalMode === 'MEASURED' || state.nodes.clusterThermalMode === 'PARTIAL';
+    const heatLabel = isMeasured ? 'TOTAL MEASURED HEAT' : 'CLUSTER THERMAL LOAD';
+    const heatSubtext = isMeasured ? 'Physical power dissipation' : 'Utilization-based proxy index';
+
     const metricsHtml = `
-      <div class="metrics-grid grid-cols-4">
+      <div class="metrics-grid grid-cols-5">
         ${MetricCard({
           label: 'NODES ONLINE',
           value: state.nodes.onlineCount,
           subtext: 'Active compute nodes'
         })}
         ${MetricCard({
-          label: 'TOTAL HEAT',
-          value: state.nodes.totalHeatWatts,
-          subtext: 'Aggregated thermal dissipation'
+          label: 'TOTAL NODES',
+          value: state.nodes.totalCount,
+          subtext: 'Cluster inventory'
         })}
         ${MetricCard({
-          label: 'AVG CPU',
+          label: heatLabel,
+          value: state.nodes.totalHeatWatts,
+          subtext: heatSubtext
+        })}
+        ${MetricCard({
+          label: 'AVG CPU LOAD',
           value: state.nodes.avgCpu,
           subtext: 'Cluster average utilization'
         })}
         ${MetricCard({
-          label: 'AVG GPU',
-          value: state.nodes.avgGpu,
-          subtext: 'Cluster average utilization'
+          label: 'AVG NODE THERMAL',
+          value: state.nodes.avgNodeThermalLoad || 'N/A',
+          subtext: 'Aggregate thermal load index'
         })}
       </div>
     `;
 
     const tableColumns = [
       'Node ID',
+      'Hostname',
       'Status',
-      'CPU',
+      'CPU Load',
+      'CPU Workload',
+      'CPU Thermal Load',
       'CPU Temp',
       'CPU Power',
-      'GPU',
+      'GPU Load',
       'GPU Temp',
       'GPU Power',
-      'Workload',
+      'Node Thermal Load',
+      'Thermal Signal',
       'Est Heat'
     ];
 
-    const tableRows = state.nodes.telemetryList.map(node => [
-      node.id,
-      `<span class="status-${node.status.toLowerCase()}">${node.status}</span>`,
-      node.cpu,
-      node.cpuTemp,
-      node.cpuPower,
-      node.gpu,
-      node.gpuTemp,
-      node.gpuPower,
-      node.workload,
-      node.estHeat
-    ]);
+    const tableRows = (state.nodes.telemetryList || []).map(node => {
+      const signalClass = (node.thermal_signal || 'unavailable').toLowerCase();
+      const signalBadge = `<span class="status-badge status-${signalClass}">${node.thermal_signal || 'UNAVAILABLE'}</span>`;
+      const statusBadge = `<span class="status-badge status-${(node.status || 'offline').toLowerCase()}">${node.status}</span>`;
+
+      return [
+        node.id,
+        node.hostname || 'N/A',
+        statusBadge,
+        node.cpu,
+        node.cpu_workload || node.workload || 'IDLE',
+        node.cpu_thermal_index_str || (node.cpu_thermal_index !== undefined && node.cpu_thermal_index !== null ? `${Math.round(node.cpu_thermal_index)} / 100` : 'N/A'),
+        node.cpu_temp || 'N/A',
+        node.cpu_power || 'N/A',
+        node.gpu,
+        node.gpu_temp || 'N/A',
+        node.gpu_power || 'N/A',
+        node.node_thermal_index_str || (node.node_thermal_index !== undefined && node.node_thermal_index !== null ? `${Math.round(node.node_thermal_index)} / 100` : 'N/A'),
+        signalBadge,
+        node.est_heat || 'N/A'
+      ];
+    });
 
     const tablePanel = Panel({
-      title: 'NODE TELEMETRY TABLE',
+      title: 'COMPUTER NODE CLUSTER TELEMETRY & THERMAL LOAD PROXIES',
       content: DataTable({
         columns: tableColumns,
         rows: tableRows,
-        emptyMessage: 'NO DATA AVAILABLE'
+        emptyMessage: 'NO NODES CONNECTED'
       })
     });
 

@@ -106,7 +106,12 @@
       `;
     } else {
       tbodyContent = rows.map(row => {
-        const tds = row.map(cell => `<td>${escapeHtml(cell)}</td>`).join('');
+        const tds = row.map(cell => {
+          if (typeof cell === 'string' && (cell.startsWith('<span') || cell.startsWith('<div'))) {
+            return `<td>${cell}</td>`;
+          }
+          return `<td>${escapeHtml(cell)}</td>`;
+        }).join('');
         return `<tr>${tds}</tr>`;
       }).join('');
     }

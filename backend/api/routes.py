@@ -12,6 +12,8 @@ from pydantic import BaseModel, Field
 import numpy as np
 
 from backend.occupancy.state import global_state
+from backend.nodes.schemas import NodeTelemetryPayload
+from backend.nodes.state import global_node_state
 
 logger = logging.getLogger("hveac.api")
 
@@ -206,3 +208,37 @@ async def video_feed():
         frame_generator(),
         media_type="multipart/x-mixed-replace; boundary=frame"
     )
+
+
+# ==============================================================================
+# Node Telemetry Endpoints
+# ==============================================================================
+
+@router.post("/api/nodes/telemetry")
+async def post_node_telemetry(payload: NodeTelemetryPayload):
+    """
+    Ingests normalized hardware and computational telemetry from HVEAC Endpoint Agents.
+    """
+    res = global_node_state.record_telemetry(payload)
+    return JSONResponse(content=res)
+
+
+@router.get("/api/nodes")
+async def get_nodes():
+    """
+    Returns active compute node inventory and aggregated thermal metrics.
+    """
+    overview = global_node_state.get_all_nodes()
+    return JSONResponse(content=overview)
+
+
+@router.get("/api/nodes/{node_id}")
+async def get_node_by_id(node_id: str):
+    """
+    Returns the latest telemetry snapshot and status for a specific node.
+    """
+    node = global_node_state.get_node(node_id)
+    if not node:
+        raise HTTPException(status_code=404, detail=f"Node '{node_id}' not found")
+    return JSONResponse(content=node)
+

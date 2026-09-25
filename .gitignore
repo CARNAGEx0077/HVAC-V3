@@ -1,0 +1,18 @@
+# .NET build artifacts
+bin/
+obj/
+*.user
+*.suo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+.venv/
+env/
+
+# IDE
+.vs/
+.idea/
+.vscode/
