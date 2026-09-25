@@ -1,0 +1,33 @@
+{
+  "room_temperature_sensitivity": {
+    "pearson_correlation": -0.8542,
+    "expected_direction": "Negative or flat (higher indoor temp -> cooler setpoint)",
+    "observed_direction": "Negative",
+    "mean_predicted_setpoint_by_temp_bin": {
+      "(23.049, 24.015]": 25.991,
+      "(24.015, 24.976]": 25.907,
+      "(24.976, 25.938]": 25.571,
+      "(25.938, 26.899]": 24.812,
+      "(26.899, 27.86]": 24.5
+    },
+    "physically_sound": true
+  },
+  "heat_load_sensitivity": {
+    "pearson_correlation": -0.03,
+    "expected_direction": "Negative or flat (higher heat load -> lower/equal setpoint for comfort)",
+    "observed_direction": "Negative",
+    "mean_predicted_setpoint_by_load_bin": {
+      "(4923.987, 5527.614]": 25.506,
+      "(5527.614, 6128.238]": 25.57,
+      "(6128.238, 6728.862]": 25.02,
+      "(6728.862, 7329.486]": 25.962,
+      "(7329.486, 7930.11]": 25.703
+    },
+    "physically_sound": true
+  },
+  "range_bounds_check": {
+    "min_prediction_c": 24.5,
+    "max_prediction_c": 26.0,
+    "within_admissible_bounds": true
+  }
+}

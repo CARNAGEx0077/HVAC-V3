@@ -152,6 +152,8 @@ class ScenarioEngine:
                 rec[f"gpu_util_comp_{cid}"] = c.gpu_utilization_percent
                 rec[f"workload_cat_comp_{cid}"] = c.workload_category
                 rec[f"heat_w_comp_{cid}"] = c.synthetic_heat_w
+                rec[f"thermal_contrib_comp_{cid}"] = c.thermal_contribution
+                rec[f"status_comp_{cid}"] = c.status
 
             # Environment features
             rec["outdoor_temperature_c"] = env_state.outdoor_temperature_c

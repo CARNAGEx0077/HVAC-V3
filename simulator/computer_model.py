@@ -11,26 +11,53 @@ from simulator.config import ComputerHeatConfig
 from simulator.room import ComputerLocation, FIXED_COMPUTERS
 
 
-def classify_workload(cpu_utilization: float, config: ComputerHeatConfig) -> str:
+def classify_workload(cpu_utilization: float, gpu_utilization: float = 0.0, config: Optional[ComputerHeatConfig] = None) -> str:
     """
     Deterministic workload classifier matching HVEAC standard thresholds:
-    0 <= CPU < 10%   -> IDLE
-    10 <= CPU < 30%  -> LIGHT
-    30 <= CPU < 60%  -> GENERAL
-    60 <= CPU < 80%  -> CPU_INTENSIVE
-    80 <= CPU <= 100% -> HEAVY_CPU_LOAD
+    - HEAVY: CPU >= 75% AND GPU >= 60%
+    - CPU_INTENSIVE: CPU >= 75%
+    - GPU_INTENSIVE: GPU >= 60%
+    - GENERAL: 30% <= CPU < 75% or 25% <= GPU < 60%
+    - LIGHT: 10% <= CPU < 30% or 8% <= GPU < 25%
+    - IDLE: CPU < 10% and GPU < 8%
     """
     cpu = min(max(float(cpu_utilization), 0.0), 100.0)
-    if cpu < config.idle_threshold:
-        return "IDLE"
-    elif cpu < config.light_threshold:
-        return "LIGHT"
-    elif cpu < config.general_threshold:
-        return "GENERAL"
-    elif cpu < config.cpu_intensive_threshold:
+    gpu = min(max(float(gpu_utilization), 0.0), 100.0)
+    
+    if cpu >= 75.0 and gpu >= 60.0:
+        return "HEAVY"
+    elif cpu >= 75.0:
         return "CPU_INTENSIVE"
+    elif gpu >= 60.0:
+        return "GPU_INTENSIVE"
+    elif cpu >= 30.0 or gpu >= 25.0:
+        return "GENERAL"
+    elif cpu >= 10.0 or gpu >= 8.0:
+        return "LIGHT"
     else:
-        return "HEAVY_CPU_LOAD"
+        return "IDLE"
+
+
+def derive_thermal_contribution(heat_watts: float) -> str:
+    """Derives simulated thermal contribution indicator from dissipated heat."""
+    if heat_watts >= 240.0:
+        return "VERY HIGH"
+    elif heat_watts >= 170.0:
+        return "HIGH"
+    elif heat_watts >= 100.0:
+        return "MODERATE"
+    else:
+        return "LOW"
+
+
+def derive_simulated_status(workload_category: str, cpu_util: float = 0.0) -> str:
+    """Derives simulated computer node operational status."""
+    if workload_category in ("HEAVY", "CPU_INTENSIVE", "GPU_INTENSIVE") or cpu_util >= 75.0:
+        return "HEAVY LOAD"
+    elif workload_category == "IDLE" or cpu_util < 10.0:
+        return "IDLE"
+    else:
+        return "RUNNING"
 
 
 @dataclass
@@ -45,6 +72,8 @@ class ComputerState:
     gpu_utilization_percent: float
     workload_category: str
     synthetic_heat_w: float
+    thermal_contribution: str = "LOW"
+    status: str = "RUNNING"
 
 
 class ComputerNodeModel:
@@ -57,6 +86,8 @@ class ComputerNodeModel:
         self.gpu_utilization = 0.0
         self.workload_category = "IDLE"
         self.synthetic_heat_w = self.calculate_heat(5.0, 0.0)
+        self.thermal_contribution = derive_thermal_contribution(self.synthetic_heat_w)
+        self.status = derive_simulated_status(self.workload_category, self.cpu_utilization)
 
     def calculate_heat(self, cpu_util: float, gpu_util: float) -> float:
         """
@@ -76,8 +107,10 @@ class ComputerNodeModel:
         """Set simulated workload and update heat dissipation."""
         self.cpu_utilization = min(max(round(float(cpu_util), 2), 0.0), 100.0)
         self.gpu_utilization = min(max(round(float(gpu_util), 2), 0.0), 100.0)
-        self.workload_category = classify_workload(self.cpu_utilization, self.config)
+        self.workload_category = classify_workload(self.cpu_utilization, self.gpu_utilization, self.config)
         self.synthetic_heat_w = self.calculate_heat(self.cpu_utilization, self.gpu_utilization)
+        self.thermal_contribution = derive_thermal_contribution(self.synthetic_heat_w)
+        self.status = derive_simulated_status(self.workload_category, self.cpu_utilization)
         return self.get_state()
 
     def get_state(self) -> ComputerState:
@@ -91,6 +124,8 @@ class ComputerNodeModel:
             gpu_utilization_percent=self.gpu_utilization,
             workload_category=self.workload_category,
             synthetic_heat_w=self.synthetic_heat_w,
+            thermal_contribution=self.thermal_contribution,
+            status=self.status,
         )
 
 

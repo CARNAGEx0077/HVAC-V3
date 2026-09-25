@@ -1,0 +1,96 @@
+{
+  "model_name": "Random Forest",
+  "split_name": "validation",
+  "sample_count": 10800,
+  "classification_metrics": {
+    "accuracy": 0.7998148148148149,
+    "balanced_accuracy": 0.6160225176065135,
+    "macro_precision": 0.684466448699174,
+    "macro_recall": 0.6160225176065135,
+    "macro_f1": 0.5746474987159025,
+    "weighted_f1": 0.7257393706163519
+  },
+  "physical_metrics": {
+    "mae_deg_c": 0.1001,
+    "rmse_deg_c": 0.2237,
+    "median_absolute_error_c": 0.0,
+    "maximum_absolute_error_c": 0.5,
+    "pct_within_0_5_c": 100.0,
+    "pct_within_1_0_c": 100.0
+  },
+  "per_class_metrics": {
+    "24.5\u00b0C": {
+      "setpoint_c": 24.5,
+      "precision": 0.9633,
+      "recall": 1.0,
+      "f1": 0.9813,
+      "support": 2181,
+      "predicted_count": 2264
+    },
+    "25.0\u00b0C": {
+      "setpoint_c": 25.0,
+      "precision": 0.954,
+      "recall": 0.1056,
+      "f1": 0.1901,
+      "support": 786,
+      "predicted_count": 87
+    },
+    "25.5\u00b0C": {
+      "setpoint_c": 25.5,
+      "precision": 0.8464,
+      "recall": 0.9897,
+      "f1": 0.9125,
+      "support": 3687,
+      "predicted_count": 4311
+    },
+    "26.0\u00b0C": {
+      "setpoint_c": 26.0,
+      "precision": 0.6585,
+      "recall": 0.9848,
+      "f1": 0.7893,
+      "support": 2767,
+      "predicted_count": 4138
+    },
+    "26.5\u00b0C": {
+      "setpoint_c": 26.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 1379,
+      "predicted_count": 0
+    }
+  },
+  "rare_regime_metrics": {
+    "24.5\u00b0C": {
+      "actual_setpoint_c": 24.5,
+      "row_count": 2181,
+      "scenario_count": 4,
+      "accuracy": 1.0,
+      "mae_deg_c": 0.0,
+      "pct_within_0_5_c": 100.0,
+      "predicted_distribution": {
+        "24.5\u00b0C": 2181
+      }
+    },
+    "26.5\u00b0C": {
+      "actual_setpoint_c": 26.5,
+      "row_count": 1379,
+      "scenario_count": 3,
+      "accuracy": 0.0,
+      "mae_deg_c": 0.5,
+      "pct_within_0_5_c": 100.0,
+      "predicted_distribution": {
+        "26.0\u00b0C": 1379
+      }
+    }
+  },
+  "temporal_metrics": {
+    "total_scenarios_evaluated": 15,
+    "mean_prediction_changes_per_scenario": 0.87,
+    "mean_actual_changes_per_scenario": 0.67,
+    "mean_prediction_changes_per_hour": 0.43,
+    "max_single_step_prediction_jump_c": 1.0,
+    "average_prediction_dwell_seconds": 3857.1,
+    "temporal_stability_status": "STABLE"
+  }
+}

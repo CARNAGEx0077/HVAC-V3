@@ -39,22 +39,37 @@ class Scenario1LocalizedCompute(BaseScenario):
     ) -> TimestepInput:
         rand_val = lambda low, high: float(rng.uniform(low, high)) if rng else (low + high) / 2.0
 
-        # Cluster computers 1-4: ramp up from moderate to heavy compute between t=300s and t=900s
-        ramp = self.smooth_ramp(t_seconds, 300.0, 900.0, 0.0, 1.0)
+        # Computers 1-4 in ZONE_1 ramp smoothly from baseline into HEAVY workload (t=0s to t=200s)
+        ramp = self.smooth_ramp(t_seconds, 0.0, 200.0, 0.0, 1.0)
         
-        workloads: Dict[int, Tuple[float, float]] = {}
-        # Cluster (1-4) in ZONE_1
-        for cid in (1, 2, 3, 4):
-            base_cpu = 30.0 + ramp * 55.0  # 30% -> 85%
-            base_gpu = 15.0 + ramp * 70.0  # 15% -> 85%
-            cpu = base_cpu + rand_val(-3.0, 3.0)
-            gpu = base_gpu + rand_val(-3.0, 3.0)
-            workloads[cid] = (round(min(max(cpu, 5.0), 98.0), 2), round(min(max(gpu, 0.0), 98.0), 2))
+        # Smooth continuous thermal wave (no discrete random jitter)
+        wave = lambda cid, phase=0.0: float(np.sin(2.0 * np.pi * t_seconds / 280.0 + cid + phase))
 
-        # Computers 5-10: simple background workload (10-25% CPU, 0-10% GPU)
-        for cid in range(5, 11):
-            cpu = 15.0 + rand_val(-4.0, 5.0)
-            gpu = 4.0 + rand_val(-2.0, 4.0)
+        workloads: Dict[int, Tuple[float, float]] = {}
+        # Workstation specs for Cluster (C1-C4) in ZONE_1: (init_cpu, target_cpu, init_gpu, target_gpu)
+        cluster_specs = {
+            1: (20.0, 92.4, 10.0, 84.1),
+            2: (18.0, 88.5, 8.0, 79.2),
+            3: (22.0, 91.0, 12.0, 82.5),
+            4: (21.0, 89.8, 11.0, 81.0),
+        }
+        for cid, (c_init, c_target, g_init, g_target) in cluster_specs.items():
+            cpu = c_init + ramp * (c_target - c_init) + 0.8 * wave(cid)
+            gpu = g_init + ramp * (g_target - g_init) + 0.6 * wave(cid, phase=1.0)
+            workloads[cid] = (round(min(max(cpu, 5.0), 99.0), 2), round(min(max(gpu, 0.0), 99.0), 2))
+
+        # Computers 5-10: simple background workload (15-20% CPU, 3-7% GPU)
+        bg_specs = {
+            5: (16.5, 5.0),
+            6: (18.0, 5.5),
+            7: (15.0, 4.0),
+            8: (19.0, 6.5),
+            9: (17.5, 4.5),
+            10: (16.0, 3.8),
+        }
+        for cid, (base_cpu, base_gpu) in bg_specs.items():
+            cpu = base_cpu + 0.6 * wave(cid)
+            gpu = base_gpu + 0.4 * wave(cid, phase=0.5)
             workloads[cid] = (round(min(max(cpu, 5.0), 30.0), 2), round(min(max(gpu, 0.0), 20.0), 2))
 
         # Occupancy: evenly distributed (3 to 4 people per zone)

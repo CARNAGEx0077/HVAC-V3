@@ -1,0 +1,609 @@
+{
+  "schema_version": "1.1.0",
+  "total_columns": 97,
+  "metadata_columns_count": 6,
+  "feature_columns_count": 80,
+  "target_columns_count": 11,
+  "metadata_columns": [
+    "scenario_id",
+    "scenario_family",
+    "run_id",
+    "random_seed",
+    "timestamp",
+    "simulation_time_seconds"
+  ],
+  "feature_columns": [
+    "occupancy_total",
+    "occupancy_zone_1",
+    "occupancy_zone_2",
+    "occupancy_zone_3",
+    "occupancy_zone_4",
+    "outdoor_temperature_c",
+    "humidity_percent",
+    "solar_load",
+    "ac1_state",
+    "ac1_setpoint_c",
+    "ac1_cooling_level",
+    "ac2_state",
+    "ac2_setpoint_c",
+    "ac2_cooling_level",
+    "ac3_state",
+    "ac3_setpoint_c",
+    "ac3_cooling_level",
+    "ac4_state",
+    "ac4_setpoint_c",
+    "ac4_cooling_level",
+    "zone_1_temperature_c",
+    "zone_2_temperature_c",
+    "zone_3_temperature_c",
+    "zone_4_temperature_c",
+    "room_average_temperature_c",
+    "minimum_temperature_c",
+    "maximum_temperature_c",
+    "temperature_difference_c",
+    "total_computer_heat_watts",
+    "total_occupancy_heat_watts",
+    "total_environmental_heat_watts",
+    "total_heat_load_watts",
+    "total_hvac_cooling_watts",
+    "comfort_score",
+    "comfort_penalty",
+    "room_temp_30s_avg",
+    "occupancy_total_30s_avg",
+    "cpu_util_30s_avg",
+    "gpu_util_30s_avg",
+    "hvac_cooling_30s_avg",
+    "computer_1_cpu",
+    "computer_1_gpu",
+    "computer_1_workload",
+    "computer_1_heat",
+    "computer_2_cpu",
+    "computer_2_gpu",
+    "computer_2_workload",
+    "computer_2_heat",
+    "computer_3_cpu",
+    "computer_3_gpu",
+    "computer_3_workload",
+    "computer_3_heat",
+    "computer_4_cpu",
+    "computer_4_gpu",
+    "computer_4_workload",
+    "computer_4_heat",
+    "computer_5_cpu",
+    "computer_5_gpu",
+    "computer_5_workload",
+    "computer_5_heat",
+    "computer_6_cpu",
+    "computer_6_gpu",
+    "computer_6_workload",
+    "computer_6_heat",
+    "computer_7_cpu",
+    "computer_7_gpu",
+    "computer_7_workload",
+    "computer_7_heat",
+    "computer_8_cpu",
+    "computer_8_gpu",
+    "computer_8_workload",
+    "computer_8_heat",
+    "computer_9_cpu",
+    "computer_9_gpu",
+    "computer_9_workload",
+    "computer_9_heat",
+    "computer_10_cpu",
+    "computer_10_gpu",
+    "computer_10_workload",
+    "computer_10_heat"
+  ],
+  "target_columns": [
+    "optimal_room_setpoint_c",
+    "optimal_ac1_setpoint_c",
+    "optimal_ac2_setpoint_c",
+    "optimal_ac3_setpoint_c",
+    "optimal_ac4_setpoint_c",
+    "optimal_ac1_cooling_level",
+    "optimal_ac2_cooling_level",
+    "optimal_ac3_cooling_level",
+    "optimal_ac4_cooling_level",
+    "optimization_cost",
+    "label_reason"
+  ],
+  "excluded_from_training": {
+    "scenario_id": "Identifier field; causes memorization of scenario instance rather than learning physical dynamics",
+    "scenario_family": "Template category metadata; model must learn directly from continuous thermal states",
+    "run_id": "Batch generation tracking identifier; contains no physical information",
+    "random_seed": "PRNG seed; arbitrary numerical label that must not be used for feature correlation",
+    "timestamp": "Wall-clock UTC timestamp; introduces non-physical temporal biases",
+    "simulation_time_seconds": "Trajectory time counter; model should make decisions based on instantaneous & lagged physical state rather than elapsed time"
+  },
+  "metadata_column_details": {
+    "scenario_id": {
+      "description": "Unique identifier for the simulation scenario instance",
+      "units": "string",
+      "dtype": "string"
+    },
+    "scenario_family": {
+      "description": "Qualitative thermal and operational scenario template classification",
+      "units": "categorical",
+      "dtype": "string"
+    },
+    "run_id": {
+      "description": "Batch execution run identifier",
+      "units": "string",
+      "dtype": "string"
+    },
+    "random_seed": {
+      "description": "Deterministic PRNG seed used to generate the scenario",
+      "units": "dimensionless",
+      "dtype": "int64"
+    },
+    "timestamp": {
+      "description": "ISO 8601 UTC timestamp of record generation",
+      "units": "timestamp",
+      "dtype": "string"
+    },
+    "simulation_time_seconds": {
+      "description": "Elapsed simulation time within scenario trajectory",
+      "units": "seconds",
+      "dtype": "int64"
+    }
+  },
+  "feature_column_details": {
+    "occupancy_total": {
+      "description": "Total room occupants observed",
+      "units": "persons",
+      "dtype": "int64"
+    },
+    "occupancy_zone_1": {
+      "description": "Occupants seated in Zone 1",
+      "units": "persons",
+      "dtype": "int64"
+    },
+    "occupancy_zone_2": {
+      "description": "Occupants seated in Zone 2",
+      "units": "persons",
+      "dtype": "int64"
+    },
+    "occupancy_zone_3": {
+      "description": "Occupants seated in Zone 3",
+      "units": "persons",
+      "dtype": "int64"
+    },
+    "occupancy_zone_4": {
+      "description": "Occupants seated in Zone 4",
+      "units": "persons",
+      "dtype": "int64"
+    },
+    "outdoor_temperature_c": {
+      "description": "Ambient outdoor dry-bulb temperature",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "humidity_percent": {
+      "description": "Indoor relative air humidity",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "solar_load": {
+      "description": "Incident solar radiative heat gain through apertures",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "ac1_state": {
+      "description": "Current power state of AC Unit 1",
+      "units": "ON/OFF",
+      "dtype": "string"
+    },
+    "ac1_setpoint_c": {
+      "description": "Current operational setpoint of AC Unit 1",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "ac1_cooling_level": {
+      "description": "Current cooling modulation level of AC Unit 1",
+      "units": "fraction [0.0-1.0]",
+      "dtype": "float64"
+    },
+    "ac2_state": {
+      "description": "Current power state of AC Unit 2",
+      "units": "ON/OFF",
+      "dtype": "string"
+    },
+    "ac2_setpoint_c": {
+      "description": "Current operational setpoint of AC Unit 2",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "ac2_cooling_level": {
+      "description": "Current cooling modulation level of AC Unit 2",
+      "units": "fraction [0.0-1.0]",
+      "dtype": "float64"
+    },
+    "ac3_state": {
+      "description": "Current power state of AC Unit 3",
+      "units": "ON/OFF",
+      "dtype": "string"
+    },
+    "ac3_setpoint_c": {
+      "description": "Current operational setpoint of AC Unit 3",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "ac3_cooling_level": {
+      "description": "Current cooling modulation level of AC Unit 3",
+      "units": "fraction [0.0-1.0]",
+      "dtype": "float64"
+    },
+    "ac4_state": {
+      "description": "Current power state of AC Unit 4",
+      "units": "ON/OFF",
+      "dtype": "string"
+    },
+    "ac4_setpoint_c": {
+      "description": "Current operational setpoint of AC Unit 4",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "ac4_cooling_level": {
+      "description": "Current cooling modulation level of AC Unit 4",
+      "units": "fraction [0.0-1.0]",
+      "dtype": "float64"
+    },
+    "zone_1_temperature_c": {
+      "description": "Mean sensible air temperature in Zone 1",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "zone_2_temperature_c": {
+      "description": "Mean sensible air temperature in Zone 2",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "zone_3_temperature_c": {
+      "description": "Mean sensible air temperature in Zone 3",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "zone_4_temperature_c": {
+      "description": "Mean sensible air temperature in Zone 4",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "room_average_temperature_c": {
+      "description": "Volume-weighted mean sensible room temperature",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "minimum_temperature_c": {
+      "description": "Minimum observed sensible zone temperature",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "maximum_temperature_c": {
+      "description": "Maximum observed sensible zone temperature",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "temperature_difference_c": {
+      "description": "Spatial thermal gradient (max - min zone temperature)",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "total_computer_heat_watts": {
+      "description": "Aggregate synthetic heat dissipated by all 10 computers",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "total_occupancy_heat_watts": {
+      "description": "Sensible heat dissipated by human occupants",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "total_environmental_heat_watts": {
+      "description": "Conduction and solar heat transfer across building envelope",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "total_heat_load_watts": {
+      "description": "Sum of all active heat sources in the room",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "total_hvac_cooling_watts": {
+      "description": "Total cooling power actively extracted by HVAC units",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "comfort_score": {
+      "description": "Baseline room thermal comfort score [0-100] based on Fanger PMV",
+      "units": "score",
+      "dtype": "float64"
+    },
+    "comfort_penalty": {
+      "description": "Thermal discomfort penalty relative to ISO 7730 bounds",
+      "units": "dimensionless",
+      "dtype": "float64"
+    },
+    "room_temp_30s_avg": {
+      "description": "30-second trailing rolling average of room temperature",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "occupancy_total_30s_avg": {
+      "description": "30-second trailing rolling average of total occupancy",
+      "units": "persons",
+      "dtype": "float64"
+    },
+    "cpu_util_30s_avg": {
+      "description": "30-second trailing rolling average of room-wide CPU utilization",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "gpu_util_30s_avg": {
+      "description": "30-second trailing rolling average of room-wide GPU utilization",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "hvac_cooling_30s_avg": {
+      "description": "30-second trailing rolling average of aggregate cooling power",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "computer_1_cpu": {
+      "description": "CPU utilization percentage for Computer 1",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_1_gpu": {
+      "description": "GPU utilization percentage for Computer 1",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_1_workload": {
+      "description": "Workload classification category for Computer 1",
+      "units": "categorical",
+      "dtype": "string"
+    },
+    "computer_1_heat": {
+      "description": "Synthetic thermal dissipation for Computer 1",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "computer_2_cpu": {
+      "description": "CPU utilization percentage for Computer 2",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_2_gpu": {
+      "description": "GPU utilization percentage for Computer 2",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_2_workload": {
+      "description": "Workload classification category for Computer 2",
+      "units": "categorical",
+      "dtype": "string"
+    },
+    "computer_2_heat": {
+      "description": "Synthetic thermal dissipation for Computer 2",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "computer_3_cpu": {
+      "description": "CPU utilization percentage for Computer 3",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_3_gpu": {
+      "description": "GPU utilization percentage for Computer 3",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_3_workload": {
+      "description": "Workload classification category for Computer 3",
+      "units": "categorical",
+      "dtype": "string"
+    },
+    "computer_3_heat": {
+      "description": "Synthetic thermal dissipation for Computer 3",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "computer_4_cpu": {
+      "description": "CPU utilization percentage for Computer 4",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_4_gpu": {
+      "description": "GPU utilization percentage for Computer 4",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_4_workload": {
+      "description": "Workload classification category for Computer 4",
+      "units": "categorical",
+      "dtype": "string"
+    },
+    "computer_4_heat": {
+      "description": "Synthetic thermal dissipation for Computer 4",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "computer_5_cpu": {
+      "description": "CPU utilization percentage for Computer 5",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_5_gpu": {
+      "description": "GPU utilization percentage for Computer 5",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_5_workload": {
+      "description": "Workload classification category for Computer 5",
+      "units": "categorical",
+      "dtype": "string"
+    },
+    "computer_5_heat": {
+      "description": "Synthetic thermal dissipation for Computer 5",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "computer_6_cpu": {
+      "description": "CPU utilization percentage for Computer 6",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_6_gpu": {
+      "description": "GPU utilization percentage for Computer 6",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_6_workload": {
+      "description": "Workload classification category for Computer 6",
+      "units": "categorical",
+      "dtype": "string"
+    },
+    "computer_6_heat": {
+      "description": "Synthetic thermal dissipation for Computer 6",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "computer_7_cpu": {
+      "description": "CPU utilization percentage for Computer 7",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_7_gpu": {
+      "description": "GPU utilization percentage for Computer 7",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_7_workload": {
+      "description": "Workload classification category for Computer 7",
+      "units": "categorical",
+      "dtype": "string"
+    },
+    "computer_7_heat": {
+      "description": "Synthetic thermal dissipation for Computer 7",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "computer_8_cpu": {
+      "description": "CPU utilization percentage for Computer 8",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_8_gpu": {
+      "description": "GPU utilization percentage for Computer 8",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_8_workload": {
+      "description": "Workload classification category for Computer 8",
+      "units": "categorical",
+      "dtype": "string"
+    },
+    "computer_8_heat": {
+      "description": "Synthetic thermal dissipation for Computer 8",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "computer_9_cpu": {
+      "description": "CPU utilization percentage for Computer 9",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_9_gpu": {
+      "description": "GPU utilization percentage for Computer 9",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_9_workload": {
+      "description": "Workload classification category for Computer 9",
+      "units": "categorical",
+      "dtype": "string"
+    },
+    "computer_9_heat": {
+      "description": "Synthetic thermal dissipation for Computer 9",
+      "units": "Watts",
+      "dtype": "float64"
+    },
+    "computer_10_cpu": {
+      "description": "CPU utilization percentage for Computer 10",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_10_gpu": {
+      "description": "GPU utilization percentage for Computer 10",
+      "units": "percent",
+      "dtype": "float64"
+    },
+    "computer_10_workload": {
+      "description": "Workload classification category for Computer 10",
+      "units": "categorical",
+      "dtype": "string"
+    },
+    "computer_10_heat": {
+      "description": "Synthetic thermal dissipation for Computer 10",
+      "units": "Watts",
+      "dtype": "float64"
+    }
+  },
+  "target_column_details": {
+    "optimal_room_setpoint_c": {
+      "description": "Global multi-objective optimal thermostat setpoint",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "optimal_ac1_setpoint_c": {
+      "description": "Zone-tailored optimal temperature setpoint for AC Unit 1",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "optimal_ac2_setpoint_c": {
+      "description": "Zone-tailored optimal temperature setpoint for AC Unit 2",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "optimal_ac3_setpoint_c": {
+      "description": "Zone-tailored optimal temperature setpoint for AC Unit 3",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "optimal_ac4_setpoint_c": {
+      "description": "Zone-tailored optimal temperature setpoint for AC Unit 4",
+      "units": "deg_C",
+      "dtype": "float64"
+    },
+    "optimal_ac1_cooling_level": {
+      "description": "Recommended inverter compressor cooling modulation level for AC Unit 1",
+      "units": "fraction [0.0-1.0]",
+      "dtype": "float64"
+    },
+    "optimal_ac2_cooling_level": {
+      "description": "Recommended inverter compressor cooling modulation level for AC Unit 2",
+      "units": "fraction [0.0-1.0]",
+      "dtype": "float64"
+    },
+    "optimal_ac3_cooling_level": {
+      "description": "Recommended inverter compressor cooling modulation level for AC Unit 3",
+      "units": "fraction [0.0-1.0]",
+      "dtype": "float64"
+    },
+    "optimal_ac4_cooling_level": {
+      "description": "Recommended inverter compressor cooling modulation level for AC Unit 4",
+      "units": "fraction [0.0-1.0]",
+      "dtype": "float64"
+    },
+    "optimization_cost": {
+      "description": "Evaluated scalar multi-objective penalty score",
+      "units": "dimensionless",
+      "dtype": "float64"
+    },
+    "label_reason": {
+      "description": "Categorical domain explanation for the optimizer decision",
+      "units": "categorical",
+      "dtype": "string"
+    }
+  }
+}

@@ -38,29 +38,43 @@ class Scenario5OpposingZones(BaseScenario):
     ) -> TimestepInput:
         rand_val = lambda low, high: float(rng.uniform(low, high)) if rng else (low + high) / 2.0
 
-        ramp = self.smooth_ramp(t_seconds, 240.0, 720.0, 0.0, 1.0)
+        # Ramp smoothly from t=0s to t=200s
+        ramp = self.smooth_ramp(t_seconds, 0.0, 200.0, 0.0, 1.0)
+        wave = lambda cid, phase=0.0: float(np.sin(2.0 * np.pi * t_seconds / 280.0 + cid + phase))
 
         workloads: Dict[int, Tuple[float, float]] = {}
         # West side: Computers 1, 2, 3, 4 (Zone 1) and 9, 10 (Zone 4) -> Heavy Compute
-        for cid in (1, 2, 3, 4, 9, 10):
-            base_cpu = 30.0 + ramp * 55.0  # 30% -> 85%
-            base_gpu = 20.0 + ramp * 65.0  # 20% -> 85%
-            cpu = base_cpu + rand_val(-3.0, 3.0)
-            gpu = base_gpu + rand_val(-3.0, 3.0)
-            workloads[cid] = (round(min(max(cpu, 10.0), 98.0), 2), round(min(max(gpu, 0.0), 98.0), 2))
+        west_specs = {
+            1: (20.0, 92.0, 10.0, 83.0),
+            2: (19.0, 88.5, 9.0, 80.0),
+            3: (21.0, 90.5, 11.0, 81.5),
+            4: (20.5, 89.0, 10.5, 82.0),
+            9: (19.0, 88.0, 9.0, 80.0),
+            10: (20.0, 91.0, 10.0, 82.5),
+        }
+        for cid, (c_init, c_target, g_init, g_target) in west_specs.items():
+            cpu = c_init + ramp * (c_target - c_init) + 0.8 * wave(cid)
+            gpu = g_init + ramp * (g_target - g_init) + 0.6 * wave(cid, phase=1.0)
+            workloads[cid] = (round(min(max(cpu, 10.0), 99.0), 2), round(min(max(gpu, 0.0), 99.0), 2))
 
         # East side: Computers 5, 6 (Zone 2) and 7, 8 (Zone 3) -> Low Compute
-        for cid in (5, 6, 7, 8):
-            cpu = 15.0 + rand_val(-3.0, 4.0)
-            gpu = 3.0 + rand_val(-2.0, 3.0)
+        east_specs = {
+            5: (16.0, 4.5),
+            6: (17.5, 5.0),
+            7: (15.5, 4.0),
+            8: (18.0, 5.5),
+        }
+        for cid, (base_cpu, base_gpu) in east_specs.items():
+            cpu = base_cpu + 0.6 * wave(cid)
+            gpu = base_gpu + 0.4 * wave(cid, phase=0.5)
             workloads[cid] = (round(min(max(cpu, 5.0), 25.0), 2), round(min(max(gpu, 0.0), 15.0), 2))
 
         # Occupancy: Concentrated in East side (ZONE_2 & ZONE_3)
         # West side (ZONE_1 & ZONE_4) has minimal occupants
-        z2_occ = int(round(2 + ramp * 8 + rand_val(-0.4, 0.4)))   # 10 occupants
-        z3_occ = int(round(2 + ramp * 9 + rand_val(-0.4, 0.4)))   # 11 occupants
-        z1_occ = max(1, int(round(1 + rand_val(-0.3, 0.3))))     # 1 occupant
-        z4_occ = max(1, int(round(1 + rand_val(-0.3, 0.3))))     # 1 occupant
+        z2_occ = int(round(2 + ramp * 8))   # 10 occupants
+        z3_occ = int(round(2 + ramp * 9))   # 11 occupants
+        z1_occ = 1
+        z4_occ = 1
 
         occupancy = {
             "ZONE_1": z1_occ,

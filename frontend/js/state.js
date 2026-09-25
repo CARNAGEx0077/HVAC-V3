@@ -65,7 +65,22 @@
       visionEngine: 'OFFLINE',
       occupancy: 'STANDBY'
     },
-    commands: []
+    commands: [],
+    simulation: {
+      activeScenarioId: 1,
+      status: 'READY',
+      speed: 10,
+      simTimeSeconds: 0,
+      totalDurationSeconds: 7200,
+      stepIndex: 0,
+      totalSteps: 720,
+      pitchMode: false,
+      scenarios: [],
+      comparisons: [],
+      selectedComputerId: null,
+      history: [],
+      latestTelemetry: null
+    }
   };
 
   // State container
@@ -203,12 +218,187 @@
     }
   }
 
+  // --------------------------------------------------------------------------
+  // Simulation Lab API Actions
+  // --------------------------------------------------------------------------
+
+  async function fetchSimulationScenarios() {
+    try {
+      const resp = await fetch('/api/simulation/scenarios');
+      if (resp.ok) {
+        const data = await resp.json();
+        setState(s => ({
+          ...s,
+          simulation: {
+            ...s.simulation,
+            scenarios: data.scenarios || [],
+            activeScenarioId: data.active_scenario_id || s.simulation.activeScenarioId
+          }
+        }));
+      }
+    } catch (e) {
+      console.warn('[HVEAC Sim] Could not fetch scenarios:', e);
+    }
+  }
+
+  async function selectSimulationScenario(scenarioId) {
+    try {
+      const resp = await fetch('/api/simulation/select', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario_id: Number(scenarioId) })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        setState(s => ({
+          ...s,
+          simulation: {
+            ...s.simulation,
+            activeScenarioId: Number(scenarioId),
+            status: data.state.status,
+            simTimeSeconds: data.state.simulation_time_seconds,
+            history: [],
+            latestTelemetry: data.state
+          }
+        }));
+      }
+    } catch (e) {
+      console.error('[HVEAC Sim] Error selecting scenario:', e);
+    }
+  }
+
+  async function startSimulation() {
+    try {
+      const resp = await fetch('/api/simulation/start', { method: 'POST' });
+      if (resp.ok) {
+        const data = await resp.json();
+        setState(s => ({
+          ...s,
+          simulation: {
+            ...s.simulation,
+            status: data.state.status
+          }
+        }));
+      }
+    } catch (e) {
+      console.error('[HVEAC Sim] Error starting simulation:', e);
+    }
+  }
+
+  async function pauseSimulation() {
+    try {
+      const resp = await fetch('/api/simulation/pause', { method: 'POST' });
+      if (resp.ok) {
+        const data = await resp.json();
+        setState(s => ({
+          ...s,
+          simulation: {
+            ...s.simulation,
+            status: data.state.status
+          }
+        }));
+      }
+    } catch (e) {
+      console.error('[HVEAC Sim] Error pausing simulation:', e);
+    }
+  }
+
+  async function resetSimulation() {
+    try {
+      const resp = await fetch('/api/simulation/reset', { method: 'POST' });
+      if (resp.ok) {
+        const data = await resp.json();
+        setState(s => ({
+          ...s,
+          simulation: {
+            ...s.simulation,
+            status: data.state.status,
+            simTimeSeconds: data.state.simulation_time_seconds,
+            history: [],
+            latestTelemetry: data.state
+          }
+        }));
+      }
+    } catch (e) {
+      console.error('[HVEAC Sim] Error resetting simulation:', e);
+    }
+  }
+
+  async function setSimulationSpeed(speed) {
+    try {
+      const resp = await fetch('/api/simulation/speed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ speed: Number(speed) })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        setState(s => ({
+          ...s,
+          simulation: {
+            ...s.simulation,
+            speed: data.speed
+          }
+        }));
+      }
+    } catch (e) {
+      console.error('[HVEAC Sim] Error setting speed:', e);
+    }
+  }
+
+  async function fetchSimulationComparison() {
+    try {
+      const resp = await fetch('/api/simulation/comparison');
+      if (resp.ok) {
+        const data = await resp.json();
+        setState(s => ({
+          ...s,
+          simulation: {
+            ...s.simulation,
+            comparisons: data.comparisons || []
+          }
+        }));
+      }
+    } catch (e) {
+      console.warn('[HVEAC Sim] Could not fetch comparison summary:', e);
+    }
+  }
+
+  function togglePitchMode() {
+    setState(s => ({
+      ...s,
+      simulation: {
+        ...s.simulation,
+        pitchMode: !s.simulation.pitchMode
+      }
+    }));
+  }
+
+  function selectSimulationComputer(compId) {
+    setState(s => ({
+      ...s,
+      simulation: {
+        ...s.simulation,
+        selectedComputerId: s.simulation.selectedComputerId === compId ? null : compId
+      }
+    }));
+  }
+
   // Export State API to window
   window.HVEAC_STATE = {
     getState,
     setState,
     subscribe,
     dispatchCommand,
+    fetchSimulationScenarios,
+    selectSimulationScenario,
+    startSimulation,
+    pauseSimulation,
+    resetSimulation,
+    setSimulationSpeed,
+    fetchSimulationComparison,
+    togglePitchMode,
+    selectSimulationComputer,
     resetState: () => setState(JSON.parse(JSON.stringify(initialState)))
   };
 

@@ -1,0 +1,19 @@
+{
+  "audit_version": "1.1.0",
+  "leakage_audit_status": "PASS",
+  "total_columns_audited": 97,
+  "feature_columns_count": 80,
+  "target_columns_count": 11,
+  "metadata_columns_count": 6,
+  "metadata_in_features": [],
+  "targets_in_features": [],
+  "unclassified_columns": [],
+  "missing_features": [],
+  "missing_targets": [],
+  "missing_metadata": [],
+  "findings": [
+    "Metadata fields (scenario_id, scenario_family, run_id, random_seed, timestamp) are strictly isolated from the physical feature set.",
+    "All 11 optimization targets and derived cost metrics are strictly isolated from input features.",
+    "Lagged features use only pre-decision past observations (trailing 30s) with zero future horizon leakage."
+  ]
+}

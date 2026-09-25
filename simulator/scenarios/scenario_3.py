@@ -38,16 +38,28 @@ class Scenario3DistributedCompute(BaseScenario):
     ) -> TimestepInput:
         rand_val = lambda low, high: float(rng.uniform(low, high)) if rng else (low + high) / 2.0
 
-        # All 10 computers ramp into heavy compute between t=300s and t=900s
-        ramp = self.smooth_ramp(t_seconds, 300.0, 900.0, 0.0, 1.0)
+        # All 10 computers ramp into heavy compute smoothly from t=0s to t=200s
+        ramp = self.smooth_ramp(t_seconds, 0.0, 200.0, 0.0, 1.0)
+        wave = lambda cid, phase=0.0: float(np.sin(2.0 * np.pi * t_seconds / 270.0 + cid + phase))
 
+        # Individual initial and target operating points per machine
+        node_specs = {
+            1: (20.0, 92.0, 10.0, 83.0),
+            2: (19.0, 88.5, 9.0, 80.0),
+            3: (21.0, 90.5, 11.0, 81.5),
+            4: (20.5, 89.0, 10.5, 82.0),
+            5: (18.5, 91.5, 8.5, 84.0),
+            6: (22.0, 93.5, 12.0, 85.0),
+            7: (19.5, 89.5, 9.5, 81.0),
+            8: (21.5, 92.5, 11.5, 83.5),
+            9: (18.0, 88.0, 8.0, 79.0),
+            10: (20.0, 90.0, 10.0, 82.5),
+        }
         workloads: Dict[int, Tuple[float, float]] = {}
-        for cid in range(1, 11):
-            base_cpu = 35.0 + ramp * 52.0  # 35% -> 87%
-            base_gpu = 20.0 + ramp * 65.0  # 20% -> 85%
-            cpu = base_cpu + rand_val(-3.5, 3.5)
-            gpu = base_gpu + rand_val(-3.5, 3.5)
-            workloads[cid] = (round(min(max(cpu, 10.0), 98.0), 2), round(min(max(gpu, 0.0), 98.0), 2))
+        for cid, (c_init, c_target, g_init, g_target) in node_specs.items():
+            cpu = c_init + ramp * (c_target - c_init) + 0.8 * wave(cid)
+            gpu = g_init + ramp * (g_target - g_init) + 0.6 * wave(cid, phase=1.2)
+            workloads[cid] = (round(min(max(cpu, 10.0), 99.0), 2), round(min(max(gpu, 0.0), 99.0), 2))
 
         # Occupancy: evenly distributed (3 to 4 people per zone)
         occupancy = {

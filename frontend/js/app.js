@@ -8,12 +8,31 @@
 (function (window) {
   'use strict';
 
-  const { getState, setState, subscribe, dispatchCommand } = window.HVEAC_STATE;
+  const {
+    getState,
+    setState,
+    subscribe,
+    dispatchCommand,
+    selectSimulationScenario,
+    startSimulation,
+    pauseSimulation,
+    resetSimulation,
+    setSimulationSpeed,
+    fetchSimulationScenarios,
+    fetchSimulationComparison,
+    togglePitchMode
+  } = window.HVEAC_STATE;
+
   const {
     renderOverview,
     renderOccupancy,
     renderNodes,
     renderEnvironment,
+    renderSimulation,
+    updateSimulationDom,
+    updateBrainShadowDom,
+    updateBrainStatusDom,
+    clearBrainTrendHistory,
     renderThermal,
     renderHvac,
     renderAnalytics,
@@ -44,6 +63,10 @@
     '#/environment': {
       title: 'OUTDOOR ENVIRONMENT',
       render: renderEnvironment
+    },
+    '#/simulation': {
+      title: 'HVEAC V3 SIMULATION LAB',
+      render: renderSimulation
     },
     '#/thermal': {
       title: 'THERMAL INTELLIGENCE',
@@ -117,6 +140,23 @@
     // Render page body
     if (elMainContent && typeof routeConfig.render === 'function') {
       elMainContent.innerHTML = routeConfig.render(state);
+
+      // Post-render lifecycle hooks for Simulation Lab
+      if (currentRoute === '#/simulation') {
+        fetchSimulationScenarios();
+        if (latestSimSnapshot) {
+          updateSimulationDom(latestSimSnapshot);
+          const chartCanvas = document.getElementById('sim-chart-canvas');
+          if (chartCanvas && window.HVEAC_SIM_VISUALS) {
+            window.HVEAC_SIM_VISUALS.renderHistoryChart(chartCanvas, simHistory);
+          }
+        }
+        // Fetch brain status and start shadow polling
+        fetchBrainStatus();
+        startBrainShadowPolling();
+      } else {
+        stopBrainShadowPolling();
+      }
     }
   }
 
@@ -273,35 +313,432 @@
   }
 
   /**
-   * Event delegation for Control Center action buttons
+   * Simulation WebSocket Manager
+   * Connects to /ws/simulation for live synthetic scenario telemetry stream
+   */
+  let simSocket = null;
+  let simReconnectTimeout = null;
+  let latestSimSnapshot = null;
+  const simHistory = [];
+
+  function connectSimulationWebSocket() {
+    if (simSocket && (simSocket.readyState === WebSocket.OPEN || simSocket.readyState === WebSocket.CONNECTING)) {
+      return;
+    }
+
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/simulation`;
+
+    try {
+      simSocket = new WebSocket(wsUrl);
+
+      simSocket.onopen = () => {
+        console.info('[HVEAC Sim WS] Connected to live simulation stream.');
+      };
+
+      simSocket.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type === 'simulation_update') {
+            latestSimSnapshot = msg;
+
+            // Maintain rolling history
+            simHistory.push({
+              time: msg.simulation_time_seconds,
+              avg: msg.thermal?.room_average_temperature_c ?? 22.5,
+              z1: msg.thermal?.zone_temperatures_c?.zone_1 ?? 22.5,
+              z2: msg.thermal?.zone_temperatures_c?.zone_2 ?? 22.5,
+              z3: msg.thermal?.zone_temperatures_c?.zone_3 ?? 22.5,
+              z4: msg.thermal?.zone_temperatures_c?.zone_4 ?? 22.5
+            });
+            if (simHistory.length > 35) simHistory.shift();
+
+            // Targeted DOM & Canvas update if user is on Simulation page
+            if (getCurrentRoute() === '#/simulation') {
+              updateSimulationDom(msg);
+              const chartCanvas = document.getElementById('sim-chart-canvas');
+              if (chartCanvas && window.HVEAC_SIM_VISUALS) {
+                window.HVEAC_SIM_VISUALS.renderHistoryChart(chartCanvas, simHistory);
+              }
+            }
+          }
+        } catch (parseErr) {
+          console.error('[HVEAC Sim WS] Error parsing simulation message:', parseErr);
+        }
+      };
+
+      simSocket.onclose = () => {
+        clearTimeout(simReconnectTimeout);
+        simReconnectTimeout = setTimeout(connectSimulationWebSocket, 2500);
+      };
+
+      simSocket.onerror = () => {
+        simSocket.close();
+      };
+    } catch (e) {
+      clearTimeout(simReconnectTimeout);
+      simReconnectTimeout = setTimeout(connectSimulationWebSocket, 2500);
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // HVEAC BRAIN — Shadow Mode Polling
+  // ════════════════════════════════════════════════════════════════════════
+  let _brainPollInterval = null;
+  const BRAIN_POLL_INTERVAL_MS = 2000; // Poll every 2 seconds
+
+  /**
+   * Fetch model status/metadata once and populate the info strip.
+   */
+  async function fetchBrainStatus() {
+    try {
+      const resp = await fetch('/api/brain/status');
+      if (resp.ok) {
+        const data = await resp.json();
+        updateBrainStatusDom(data);
+      }
+    } catch (err) {
+      console.warn('[HVEAC Brain] Failed to fetch brain status:', err);
+    }
+  }
+
+  /**
+   * Fetch a single shadow prediction and update the UI.
+   */
+  async function fetchBrainShadowPrediction() {
+    if (getCurrentRoute() !== '#/simulation') return;
+    try {
+      const resp = await fetch('/api/brain/shadow-predict');
+      if (resp.ok) {
+        const data = await resp.json();
+        updateBrainShadowDom(data);
+      }
+    } catch (err) {
+      // Silent fail — shadow mode is observation only
+    }
+  }
+
+  /**
+   * Start periodic brain shadow predictions.
+   */
+  function startBrainShadowPolling() {
+    stopBrainShadowPolling();
+    // Immediate first prediction
+    fetchBrainShadowPrediction();
+    _brainPollInterval = setInterval(fetchBrainShadowPrediction, BRAIN_POLL_INTERVAL_MS);
+  }
+
+  /**
+   * Stop brain shadow polling.
+   */
+  function stopBrainShadowPolling() {
+    if (_brainPollInterval) {
+      clearInterval(_brainPollInterval);
+      _brainPollInterval = null;
+    }
+  }
+
+  /**
+   * Event delegation for interactive buttons and simulation controls
    */
   function setupEventDelegation() {
     if (!elMainContent) return;
 
     elMainContent.addEventListener('click', async (e) => {
-      const btn = e.target.closest('[data-action]');
-      if (!btn) return;
+      // 1. Control Center actions
+      const ctrlBtn = e.target.closest('[data-action]');
+      if (ctrlBtn) {
+        const action = ctrlBtn.getAttribute('data-action');
+        const target = ctrlBtn.getAttribute('data-target');
 
-      const action = btn.getAttribute('data-action');
-      const target = btn.getAttribute('data-target');
+        if (action && target) {
+          e.preventDefault();
+          ctrlBtn.disabled = true;
+          ctrlBtn.style.opacity = '0.5';
 
-      if (action && target) {
-        e.preventDefault();
-        btn.disabled = true;
-        btn.style.opacity = '0.5';
-
-        try {
-          await dispatchCommand(target, action);
-          // Re-render Control Center view to refresh Command History
-          if (getCurrentRoute() === '#/control') {
-            renderView();
+          try {
+            await dispatchCommand(target, action);
+            if (getCurrentRoute() === '#/control') {
+              renderView();
+            }
+          } finally {
+            ctrlBtn.disabled = false;
+            ctrlBtn.style.opacity = '1';
           }
-        } finally {
-          btn.disabled = false;
-          btn.style.opacity = '1';
+          return;
         }
       }
+
+      // 2. Simulation Play / Pause
+      const btnPlayPause = e.target.closest('#btn-sim-play-pause');
+      if (btnPlayPause) {
+        e.preventDefault();
+        if (latestSimSnapshot && latestSimSnapshot.status === 'RUNNING') {
+          await pauseSimulation();
+        } else {
+          await startSimulation();
+        }
+        return;
+      }
+
+      // 3. Simulation Reset
+      const btnReset = e.target.closest('#btn-sim-reset');
+      if (btnReset) {
+        e.preventDefault();
+        simHistory.length = 0; // Clear rolling chart history on reset
+        await resetSimulation();
+        return;
+      }
+
+      // 4. Simulation Speed Selector
+      const speedBtn = e.target.closest('[data-speed]');
+      if (speedBtn) {
+        e.preventDefault();
+        const spd = parseInt(speedBtn.getAttribute('data-speed'), 10);
+        if (spd) {
+          await setSimulationSpeed(spd);
+          document.querySelectorAll('.btn-speed').forEach(b => b.classList.remove('active'));
+          speedBtn.classList.add('active');
+        }
+        return;
+      }
+
+      // 5. Select Scenario
+      const selectBtn = e.target.closest('[data-select-id]');
+      if (selectBtn) {
+        e.preventDefault();
+        const sid = parseInt(selectBtn.getAttribute('data-select-id'), 10);
+        if (sid) {
+          simHistory.length = 0;
+          window._simSelectedCompId = null;
+          clearBrainTrendHistory();
+          // Reset feature adapter rolling history
+          fetch('/api/brain/adapter-reset', { method: 'POST' }).catch(() => {});
+          await selectSimulationScenario(sid);
+          renderView();
+        }
+        return;
+      }
+
+      // 6. Pitch Mode Toggle
+      const btnPitch = e.target.closest('#btn-sim-pitch');
+      if (btnPitch) {
+        e.preventDefault();
+        togglePitchMode();
+        renderView();
+        return;
+      }
+
+      // 7. Comparison Modal Toggle
+      const btnCompare = e.target.closest('#btn-sim-compare');
+      if (btnCompare) {
+        e.preventDefault();
+        const modal = document.getElementById('sim-comparison-modal');
+        if (modal) {
+          modal.style.display = 'flex';
+          loadComparisonTable();
+        }
+        return;
+      }
+
+      const btnCloseModal = e.target.closest('#btn-close-comparison') || e.target.closest('#sim-modal-overlay');
+      if (btnCloseModal) {
+        e.preventDefault();
+        const modal = document.getElementById('sim-comparison-modal');
+        if (modal) modal.style.display = 'none';
+        return;
+      }
+
+      // 8. Deselect Computer Node Button
+      const btnDeselect = e.target.closest('#btn-deselect-node');
+      if (btnDeselect) {
+        e.preventDefault();
+        window._simSelectedCompId = null;
+        highlightSelectedComputer(null);
+        return;
+      }
+
+      // 9. Click on Table Row or Inspect Button
+      const inspectBtn = e.target.closest('.btn-inspect-node');
+      const nodeRow = e.target.closest('.sim-node-row');
+      if (inspectBtn || nodeRow) {
+        const el = inspectBtn || nodeRow;
+        const cid = parseInt(el.getAttribute('data-comp-id'), 10);
+        if (cid) {
+          window._simSelectedCompId = window._simSelectedCompId === cid ? null : cid;
+          highlightSelectedComputer(window._simSelectedCompId);
+          // Highlight and scroll pin into view
+          const mapPin = document.getElementById(`sim-comp-${cid}`);
+          if (mapPin && window._simSelectedCompId) {
+            mapPin.classList.add('comp-selected');
+          }
+        }
+        return;
+      }
+
+      // 10. Click on Room Stage Workstation Pin
+      const compPin = e.target.closest('.sim-workstation');
+      if (compPin) {
+        const cid = parseInt(compPin.getAttribute('data-comp-id'), 10);
+        if (cid) {
+          window._simSelectedCompId = window._simSelectedCompId === cid ? null : cid;
+          highlightSelectedComputer(window._simSelectedCompId);
+          const targetRow = document.getElementById(`sim-row-c${cid}`);
+          if (targetRow && window._simSelectedCompId) {
+            targetRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }
+        return;
+      }
     });
+
+    function highlightSelectedComputer(compId) {
+      // Toggle row selection classes
+      for (let i = 1; i <= 10; i++) {
+        const r = document.getElementById(`sim-row-c${i}`);
+        if (r) {
+          if (i === compId) r.classList.add('row-selected');
+          else r.classList.remove('row-selected');
+        }
+        const pin = document.getElementById(`sim-comp-${i}`);
+        if (pin) {
+          if (i === compId) pin.classList.add('comp-selected');
+          else pin.classList.remove('comp-selected');
+        }
+      }
+
+      const panel = document.getElementById('sim-selected-inspector');
+      if (panel) {
+        if (!compId) {
+          panel.style.display = 'none';
+        } else if (latestSimSnapshot) {
+          const comp = latestSimSnapshot.computers?.find(c => c.id === compId);
+          if (comp) {
+            panel.style.display = 'flex';
+            const nameEl = document.getElementById('sim-insp-name');
+            if (nameEl) nameEl.textContent = comp.name;
+            const zoneEl = document.getElementById('sim-insp-zone');
+            if (zoneEl) zoneEl.textContent = comp.zone_display || comp.zone;
+            const cpuEl = document.getElementById('sim-insp-cpu');
+            if (cpuEl) cpuEl.textContent = `${comp.cpu_util_percent.toFixed(1)}%`;
+            const trendEl = document.getElementById('sim-insp-cputrend');
+            if (trendEl) {
+              const t = comp.trend_cpu || 'STABLE';
+              trendEl.textContent = t === 'UP' ? '↑' : (t === 'DOWN' ? '↓' : '→');
+              trendEl.className = `trend-icon trend-${t.toLowerCase()}`;
+            }
+            const gpuEl = document.getElementById('sim-insp-gpu');
+            if (gpuEl) gpuEl.textContent = `${comp.gpu_util_percent.toFixed(1)}%`;
+            const catEl = document.getElementById('sim-insp-cat');
+            if (catEl) {
+              catEl.textContent = comp.workload_category;
+              catEl.className = `status-badge status-${comp.workload_category.toLowerCase().replace(/_/g, '-')}`;
+            }
+            const heatEl = document.getElementById('sim-insp-heat');
+            if (heatEl) heatEl.textContent = `${comp.heat_watts.toFixed(1)} W`;
+            const hTrendEl = document.getElementById('sim-insp-heattrend');
+            if (hTrendEl) {
+              const ht = comp.trend_heat || 'STABLE';
+              hTrendEl.textContent = ht;
+              hTrendEl.className = `trend-badge trend-${ht.toLowerCase()}`;
+            }
+            const contribEl = document.getElementById('sim-insp-contrib');
+            if (contribEl) {
+              contribEl.textContent = comp.thermal_contribution;
+              contribEl.className = `contrib-badge contrib-${comp.thermal_contribution.toLowerCase().replace(/\s+/g, '-')}`;
+            }
+            const stEl = document.getElementById('sim-insp-status');
+            if (stEl) {
+              stEl.textContent = comp.status;
+              stEl.className = `status-badge status-${comp.status.toLowerCase().replace(/\s+/g, '-')}`;
+            }
+          }
+        }
+      }
+    }
+
+    // Workstation & Table hover synchronization
+    elMainContent.addEventListener('mouseover', (e) => {
+      // Hover map marker -> highlight table row
+      const compEl = e.target.closest('.sim-workstation');
+      if (compEl) {
+        const cid = parseInt(compEl.getAttribute('data-comp-id'), 10);
+        const row = document.getElementById(`sim-row-c${cid}`);
+        if (row) row.classList.add('row-hover');
+
+        const tooltip = document.getElementById('sim-comp-tooltip');
+        if (tooltip && latestSimSnapshot) {
+          const compData = latestSimSnapshot.computers?.find(c => c.id === cid);
+          if (compData) {
+            document.getElementById('sim-tt-title').textContent = compData.name;
+            document.getElementById('sim-tt-zone').textContent = compData.zone_display || compData.zone;
+            document.getElementById('sim-tt-cpu').textContent = `${compData.cpu_util_percent.toFixed(1)}%`;
+            document.getElementById('sim-tt-gpu').textContent = `${compData.gpu_util_percent.toFixed(1)}%`;
+            document.getElementById('sim-tt-workload').textContent = compData.workload_category;
+            document.getElementById('sim-tt-heat').textContent = `${compData.heat_watts.toFixed(1)} W (Simulated)`;
+
+            const rect = compEl.getBoundingClientRect();
+            const stageRect = document.getElementById('sim-room-stage').getBoundingClientRect();
+            tooltip.style.left = `${rect.left - stageRect.left + 35}px`;
+            tooltip.style.top = `${rect.top - stageRect.top - 10}px`;
+            tooltip.style.display = 'block';
+          }
+        }
+      }
+
+      // Hover table row -> highlight map marker
+      const rowEl = e.target.closest('.sim-node-row');
+      if (rowEl) {
+        const cid = parseInt(rowEl.getAttribute('data-comp-id'), 10);
+        const mapPin = document.getElementById(`sim-comp-${cid}`);
+        if (mapPin) mapPin.classList.add('comp-hover');
+      }
+    });
+
+    elMainContent.addEventListener('mouseout', (e) => {
+      const compEl = e.target.closest('.sim-workstation');
+      if (compEl) {
+        const cid = parseInt(compEl.getAttribute('data-comp-id'), 10);
+        const row = document.getElementById(`sim-row-c${cid}`);
+        if (row) row.classList.remove('row-hover');
+
+        const tooltip = document.getElementById('sim-comp-tooltip');
+        if (tooltip) tooltip.style.display = 'none';
+      }
+
+      const rowEl = e.target.closest('.sim-node-row');
+      if (rowEl) {
+        const cid = parseInt(rowEl.getAttribute('data-comp-id'), 10);
+        const mapPin = document.getElementById(`sim-comp-${cid}`);
+        if (mapPin) mapPin.classList.remove('comp-hover');
+      }
+    });
+  }
+
+  async function loadComparisonTable() {
+    const tbody = document.getElementById('sim-comparison-tbody');
+    if (!tbody) return;
+    try {
+      const resp = await fetch('/api/simulation/comparison');
+      if (resp.ok) {
+        const data = await resp.json();
+        const rows = (data.comparisons || []).map(c => `
+          <tr>
+            <td><strong>SCENARIO ${c.scenario_id}:</strong> ${c.name}</td>
+            <td><span class="meta-tag">${c.dominant_heat_source}</span></td>
+            <td>${c.initial_temperature_c.toFixed(1)}°C</td>
+            <td><strong>${c.final_temperature_c.toFixed(1)}°C</strong></td>
+            <td style="color: #ff4757; font-weight: bold;">${c.maximum_temperature_c.toFixed(1)}°C</td>
+            <td style="color: #2ed573;">${c.minimum_temperature_c.toFixed(1)}°C</td>
+            <td><strong>${Math.round(c.peak_total_heat_w)} W</strong></td>
+            <td>${Math.round(c.average_total_heat_w)} W</td>
+          </tr>
+        `).join('');
+        tbody.innerHTML = rows || '<tr><td colspan="8">No data available</td></tr>';
+      }
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="8" style="color: red;">Failed to load comparison data.</td></tr>';
+    }
   }
 
   /**
@@ -418,6 +855,9 @@
 
     // Connect real-time telemetry WebSocket
     connectTelemetryWebSocket();
+
+    // Connect real-time simulation lab WebSocket
+    connectSimulationWebSocket();
 
     // Start polling compute node cluster telemetry
     startNodePolling();

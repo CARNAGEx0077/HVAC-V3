@@ -1,0 +1,26 @@
+{
+  "24.5\u00b0C": {
+    "actual_setpoint_c": 24.5,
+    "row_count": 814,
+    "scenario_count": 3,
+    "accuracy": 1.0,
+    "mae_deg_c": 0.0,
+    "pct_within_0_5_c": 100.0,
+    "predicted_distribution": {
+      "24.5\u00b0C": 814
+    }
+  },
+  "26.5\u00b0C": {
+    "actual_setpoint_c": 26.5,
+    "row_count": 1501,
+    "scenario_count": 4,
+    "accuracy": 0.4797,
+    "mae_deg_c": 0.2635,
+    "pct_within_0_5_c": 99.33,
+    "predicted_distribution": {
+      "26.0\u00b0C": 771,
+      "26.5\u00b0C": 720,
+      "25.5\u00b0C": 10
+    }
+  }
+}

@@ -1,0 +1,377 @@
+{
+  "generator_version": "1.1.0",
+  "thermal_model_version": "1.1.0",
+  "comfort_model_version": "1.0.0-PMV-ISO7730",
+  "hvac_model_version": "1.1.0",
+  "optimizer_version": "1.1.0-temporal-constrained",
+  "run_id": "run_42_1790363499",
+  "random_seed": 42,
+  "split_seed": 42,
+  "scenario_count": 100,
+  "scenario_duration_seconds": 7200,
+  "timestep_seconds": 10,
+  "total_timesteps_per_scenario": 720,
+  "total_dataset_rows": 72000,
+  "dataset_split_strategy": {
+    "method": "family_stratified_scenario_disjoint_split",
+    "split_seed": 42,
+    "target_proportions": {
+      "train": 0.7,
+      "validation": 0.15,
+      "test": 0.15
+    },
+    "actual_scenario_counts": {
+      "train": 70,
+      "validation": 15,
+      "test": 15
+    },
+    "actual_row_counts": {
+      "raw": 72000,
+      "train": 50400,
+      "val": 10800,
+      "test": 10800
+    },
+    "scenario_family_counts_by_split": {
+      "train": {
+        "FAMILY_1": 14,
+        "FAMILY_2": 14,
+        "FAMILY_4": 14,
+        "FAMILY_5": 14,
+        "FAMILY_3": 14
+      },
+      "validation": {
+        "FAMILY_3": 3,
+        "FAMILY_4": 3,
+        "FAMILY_5": 3,
+        "FAMILY_1": 3,
+        "FAMILY_2": 3
+      },
+      "test": {
+        "FAMILY_3": 3,
+        "FAMILY_5": 3,
+        "FAMILY_2": 3,
+        "FAMILY_1": 3,
+        "FAMILY_4": 3
+      }
+    },
+    "scenario_ids_by_split": {
+      "train": [
+        "SCEN_0001_FAMILY_1",
+        "SCEN_0002_FAMILY_2",
+        "SCEN_0004_FAMILY_4",
+        "SCEN_0005_FAMILY_5",
+        "SCEN_0006_FAMILY_1",
+        "SCEN_0007_FAMILY_2",
+        "SCEN_0009_FAMILY_4",
+        "SCEN_0011_FAMILY_1",
+        "SCEN_0013_FAMILY_3",
+        "SCEN_0015_FAMILY_5",
+        "SCEN_0017_FAMILY_2",
+        "SCEN_0018_FAMILY_3",
+        "SCEN_0019_FAMILY_4",
+        "SCEN_0021_FAMILY_1",
+        "SCEN_0023_FAMILY_3",
+        "SCEN_0024_FAMILY_4",
+        "SCEN_0025_FAMILY_5",
+        "SCEN_0026_FAMILY_1",
+        "SCEN_0027_FAMILY_2",
+        "SCEN_0028_FAMILY_3",
+        "SCEN_0030_FAMILY_5",
+        "SCEN_0031_FAMILY_1",
+        "SCEN_0032_FAMILY_2",
+        "SCEN_0033_FAMILY_3",
+        "SCEN_0034_FAMILY_4",
+        "SCEN_0035_FAMILY_5",
+        "SCEN_0037_FAMILY_2",
+        "SCEN_0041_FAMILY_1",
+        "SCEN_0042_FAMILY_2",
+        "SCEN_0046_FAMILY_1",
+        "SCEN_0047_FAMILY_2",
+        "SCEN_0048_FAMILY_3",
+        "SCEN_0049_FAMILY_4",
+        "SCEN_0050_FAMILY_5",
+        "SCEN_0051_FAMILY_1",
+        "SCEN_0055_FAMILY_5",
+        "SCEN_0058_FAMILY_3",
+        "SCEN_0059_FAMILY_4",
+        "SCEN_0060_FAMILY_5",
+        "SCEN_0062_FAMILY_2",
+        "SCEN_0063_FAMILY_3",
+        "SCEN_0064_FAMILY_4",
+        "SCEN_0065_FAMILY_5",
+        "SCEN_0066_FAMILY_1",
+        "SCEN_0067_FAMILY_2",
+        "SCEN_0068_FAMILY_3",
+        "SCEN_0069_FAMILY_4",
+        "SCEN_0070_FAMILY_5",
+        "SCEN_0074_FAMILY_4",
+        "SCEN_0078_FAMILY_3",
+        "SCEN_0079_FAMILY_4",
+        "SCEN_0080_FAMILY_5",
+        "SCEN_0081_FAMILY_1",
+        "SCEN_0082_FAMILY_2",
+        "SCEN_0083_FAMILY_3",
+        "SCEN_0084_FAMILY_4",
+        "SCEN_0085_FAMILY_5",
+        "SCEN_0086_FAMILY_1",
+        "SCEN_0087_FAMILY_2",
+        "SCEN_0088_FAMILY_3",
+        "SCEN_0089_FAMILY_4",
+        "SCEN_0090_FAMILY_5",
+        "SCEN_0091_FAMILY_1",
+        "SCEN_0092_FAMILY_2",
+        "SCEN_0093_FAMILY_3",
+        "SCEN_0096_FAMILY_1",
+        "SCEN_0097_FAMILY_2",
+        "SCEN_0098_FAMILY_3",
+        "SCEN_0099_FAMILY_4",
+        "SCEN_0100_FAMILY_5"
+      ],
+      "validation": [
+        "SCEN_0003_FAMILY_3",
+        "SCEN_0014_FAMILY_4",
+        "SCEN_0020_FAMILY_5",
+        "SCEN_0036_FAMILY_1",
+        "SCEN_0039_FAMILY_4",
+        "SCEN_0040_FAMILY_5",
+        "SCEN_0043_FAMILY_3",
+        "SCEN_0052_FAMILY_2",
+        "SCEN_0057_FAMILY_2",
+        "SCEN_0071_FAMILY_1",
+        "SCEN_0073_FAMILY_3",
+        "SCEN_0076_FAMILY_1",
+        "SCEN_0077_FAMILY_2",
+        "SCEN_0094_FAMILY_4",
+        "SCEN_0095_FAMILY_5"
+      ],
+      "test": [
+        "SCEN_0008_FAMILY_3",
+        "SCEN_0010_FAMILY_5",
+        "SCEN_0012_FAMILY_2",
+        "SCEN_0016_FAMILY_1",
+        "SCEN_0022_FAMILY_2",
+        "SCEN_0029_FAMILY_4",
+        "SCEN_0038_FAMILY_3",
+        "SCEN_0044_FAMILY_4",
+        "SCEN_0045_FAMILY_5",
+        "SCEN_0053_FAMILY_3",
+        "SCEN_0054_FAMILY_4",
+        "SCEN_0056_FAMILY_1",
+        "SCEN_0061_FAMILY_1",
+        "SCEN_0072_FAMILY_2",
+        "SCEN_0075_FAMILY_5"
+      ]
+    }
+  },
+  "room_geometry": {
+    "shape": "rectangular",
+    "width_m": 10.0,
+    "length_m": 10.0,
+    "height_m": 3.0,
+    "total_volume_m3": 300.0,
+    "zones": [
+      "ZONE_1",
+      "ZONE_2",
+      "ZONE_3",
+      "ZONE_4"
+    ],
+    "zone_volume_m3": 75.0,
+    "zone_thermal_capacitance_j_per_k": 361800.0,
+    "adjacent_coupling_conductance_w_k": 120.0,
+    "diagonal_coupling_conductance_w_k": 25.0
+  },
+  "AC_positions": {
+    "AC-1": {
+      "wall": "north",
+      "position": [
+        5.0,
+        10.0
+      ],
+      "zone_influence": {
+        "ZONE_1": 0.45,
+        "ZONE_2": 0.45,
+        "ZONE_3": 0.05,
+        "ZONE_4": 0.05
+      }
+    },
+    "AC-2": {
+      "wall": "east",
+      "position": [
+        10.0,
+        5.0
+      ],
+      "zone_influence": {
+        "ZONE_1": 0.05,
+        "ZONE_2": 0.45,
+        "ZONE_3": 0.45,
+        "ZONE_4": 0.05
+      }
+    },
+    "AC-3": {
+      "wall": "south",
+      "position": [
+        5.0,
+        0.0
+      ],
+      "zone_influence": {
+        "ZONE_1": 0.05,
+        "ZONE_2": 0.05,
+        "ZONE_3": 0.45,
+        "ZONE_4": 0.45
+      }
+    },
+    "AC-4": {
+      "wall": "west",
+      "position": [
+        0.0,
+        5.0
+      ],
+      "zone_influence": {
+        "ZONE_1": 0.45,
+        "ZONE_2": 0.05,
+        "ZONE_3": 0.05,
+        "ZONE_4": 0.45
+      }
+    }
+  },
+  "computer_positions": {
+    "Computer 1": {
+      "zone": "ZONE_1",
+      "position": [
+        1.5,
+        8.5
+      ]
+    },
+    "Computer 2": {
+      "zone": "ZONE_1",
+      "position": [
+        3.0,
+        8.5
+      ]
+    },
+    "Computer 3": {
+      "zone": "ZONE_1",
+      "position": [
+        1.5,
+        7.0
+      ]
+    },
+    "Computer 4": {
+      "zone": "ZONE_1",
+      "position": [
+        3.0,
+        7.0
+      ]
+    },
+    "Computer 5": {
+      "zone": "ZONE_2",
+      "position": [
+        7.0,
+        8.5
+      ]
+    },
+    "Computer 6": {
+      "zone": "ZONE_2",
+      "position": [
+        8.5,
+        7.0
+      ]
+    },
+    "Computer 7": {
+      "zone": "ZONE_3",
+      "position": [
+        8.5,
+        2.5
+      ]
+    },
+    "Computer 8": {
+      "zone": "ZONE_3",
+      "position": [
+        7.0,
+        1.5
+      ]
+    },
+    "Computer 9": {
+      "zone": "ZONE_4",
+      "position": [
+        2.5,
+        1.5
+      ]
+    },
+    "Computer 10": {
+      "zone": "ZONE_4",
+      "position": [
+        1.5,
+        3.0
+      ]
+    }
+  },
+  "comfort_assumptions": {
+    "model_type": "ISO 7730 / ASHRAE 55 PMV-PPD",
+    "air_speed_m_s": 0.15,
+    "metabolic_rate_met": 1.1,
+    "clothing_insulation_clo": 0.5,
+    "target_pmv": 0.0,
+    "acceptable_pmv_range": [
+      -0.5,
+      0.5
+    ],
+    "indian_baseline_references": {
+      "bee_recommended_c": 24.0,
+      "hyderabad_study_mean_c": 26.1,
+      "chennai_study_mean_c": 27.0,
+      "note": "Prototype references only. Not universal ground truth."
+    },
+    "lower_comfort_threshold_c": 22.5,
+    "upper_comfort_threshold_c": 26.5
+  },
+  "simulation_constants": {
+    "computer_idle_watts": 60.0,
+    "computer_max_cpu_watts": 160.0,
+    "computer_max_gpu_watts": 240.0,
+    "computer_theoretical_max_watts": 460.0,
+    "computer_practical_max_watts": 450.97,
+    "computer_model_formula": "P_comp = Base_Idle (60W) + Max_CPU (160W) * (CPU/100)^1.10 + Max_GPU (240W) * (GPU/100)^1.15",
+    "computer_model_doc_note": "Authoritative v1.1 model; reaches ~451W in HEAVY workloads (theoretical max 460W). Obsolete ~320W documentation superseded.",
+    "occupancy_sensible_watts_per_person": 95.0,
+    "occupancy_latent_watts_per_person": 40.0,
+    "exterior_wall_conductance_w_k": 35.0,
+    "hvac_unit_cooling_capacity_watts": 4500.0,
+    "hvac_ramp_rate_per_sec": 0.02,
+    "hvac_max_cooling_ramp_per_step": 0.2,
+    "hvac_min_setpoint_dwell_seconds": 60.0,
+    "hvac_setpoint_hysteresis_cost": 0.03,
+    "hvac_max_setpoint_change_per_step_c": 0.5,
+    "hvac_min_on_seconds": 120.0,
+    "hvac_min_off_seconds": 120.0
+  },
+  "action_space": {
+    "candidate_setpoints_c": [
+      22.0,
+      22.5,
+      23.0,
+      23.5,
+      24.0,
+      24.5,
+      25.0,
+      25.5,
+      26.0,
+      26.5,
+      27.0
+    ],
+    "step_size_c": 0.5,
+    "cooling_level_range": [
+      0.0,
+      1.0
+    ]
+  },
+  "optimization_weights": {
+    "comfort_weight": 2.5,
+    "overheat_weight": 5.0,
+    "overcool_weight": 3.5,
+    "energy_weight": 0.9,
+    "switch_weight": 0.4,
+    "evaluation_horizon_seconds": 120.0
+  },
+  "optimization_formulation": "TOTAL_COST = comfort_weight * comfort_penalty + overheat_weight * overheating_penalty + overcool_weight * overcooling_penalty + energy_weight * energy_penalty + switch_weight * switching_penalty"
+}

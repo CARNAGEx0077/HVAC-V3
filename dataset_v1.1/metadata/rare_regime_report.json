@@ -1,0 +1,269 @@
+{
+  "audit_version": "1.1.0",
+  "rare_regime_audit_status": "PASS",
+  "hard_requirements_summary": {
+    "regime_24_5_c": {
+      "total_scenarios_gte_4": true,
+      "present_in_train": true,
+      "present_in_val": true,
+      "present_in_test": true,
+      "status": "PASS"
+    },
+    "regime_26_5_c": {
+      "total_scenarios_gte_4": true,
+      "present_in_train": true,
+      "present_in_val": true,
+      "present_in_test": true,
+      "status": "PASS"
+    }
+  },
+  "regimes": {
+    "setpoint_24_5_c": {
+      "name": "Rare Low Setpoint (24.5\u00b0C)",
+      "total_rows": 6528,
+      "total_scenarios": 12,
+      "train_scenarios_count": 5,
+      "val_scenarios_count": 4,
+      "test_scenarios_count": 3,
+      "train_scenarios": [
+        "SCEN_0011_FAMILY_1",
+        "SCEN_0013_FAMILY_3",
+        "SCEN_0015_FAMILY_5",
+        "SCEN_0037_FAMILY_2",
+        "SCEN_0048_FAMILY_3"
+      ],
+      "val_scenarios": [
+        "SCEN_0014_FAMILY_4",
+        "SCEN_0036_FAMILY_1",
+        "SCEN_0039_FAMILY_4",
+        "SCEN_0040_FAMILY_5"
+      ],
+      "test_scenarios": [
+        "SCEN_0012_FAMILY_2",
+        "SCEN_0038_FAMILY_3",
+        "SCEN_0056_FAMILY_1"
+      ]
+    },
+    "setpoint_26_5_c": {
+      "name": "Rare High Setpoint (26.5\u00b0C)",
+      "total_rows": 7081,
+      "total_scenarios": 15,
+      "train_scenarios_count": 8,
+      "val_scenarios_count": 3,
+      "test_scenarios_count": 4,
+      "train_scenarios": [
+        "SCEN_0017_FAMILY_2",
+        "SCEN_0019_FAMILY_4",
+        "SCEN_0041_FAMILY_1",
+        "SCEN_0042_FAMILY_2",
+        "SCEN_0066_FAMILY_1",
+        "SCEN_0067_FAMILY_2",
+        "SCEN_0069_FAMILY_4",
+        "SCEN_0092_FAMILY_2"
+      ],
+      "val_scenarios": [
+        "SCEN_0020_FAMILY_5",
+        "SCEN_0076_FAMILY_1",
+        "SCEN_0094_FAMILY_4"
+      ],
+      "test_scenarios": [
+        "SCEN_0008_FAMILY_3",
+        "SCEN_0016_FAMILY_1",
+        "SCEN_0044_FAMILY_4",
+        "SCEN_0045_FAMILY_5"
+      ]
+    },
+    "high_compute_load": {
+      "name": "High Compute Load (> 3000W)",
+      "total_rows": 15438,
+      "total_scenarios": 26,
+      "train_scenarios_count": 17,
+      "val_scenarios_count": 4,
+      "test_scenarios_count": 5,
+      "train_scenarios": [
+        "SCEN_0013_FAMILY_3",
+        "SCEN_0018_FAMILY_3",
+        "SCEN_0023_FAMILY_3",
+        "SCEN_0028_FAMILY_3",
+        "SCEN_0033_FAMILY_3",
+        "SCEN_0048_FAMILY_3",
+        "SCEN_0058_FAMILY_3",
+        "SCEN_0063_FAMILY_3",
+        "SCEN_0065_FAMILY_5",
+        "SCEN_0068_FAMILY_3",
+        "SCEN_0070_FAMILY_5",
+        "SCEN_0078_FAMILY_3",
+        "SCEN_0080_FAMILY_5",
+        "SCEN_0083_FAMILY_3",
+        "SCEN_0085_FAMILY_5",
+        "SCEN_0093_FAMILY_3",
+        "SCEN_0098_FAMILY_3"
+      ],
+      "val_scenarios": [
+        "SCEN_0003_FAMILY_3",
+        "SCEN_0020_FAMILY_5",
+        "SCEN_0043_FAMILY_3",
+        "SCEN_0073_FAMILY_3"
+      ],
+      "test_scenarios": [
+        "SCEN_0016_FAMILY_1",
+        "SCEN_0038_FAMILY_3",
+        "SCEN_0045_FAMILY_5",
+        "SCEN_0053_FAMILY_3",
+        "SCEN_0075_FAMILY_5"
+      ]
+    },
+    "high_occupancy": {
+      "name": "High Occupancy (>= 25 persons)",
+      "total_rows": 12240,
+      "total_scenarios": 17,
+      "train_scenarios_count": 13,
+      "val_scenarios_count": 3,
+      "test_scenarios_count": 1,
+      "train_scenarios": [
+        "SCEN_0004_FAMILY_4",
+        "SCEN_0009_FAMILY_4",
+        "SCEN_0019_FAMILY_4",
+        "SCEN_0032_FAMILY_2",
+        "SCEN_0034_FAMILY_4",
+        "SCEN_0049_FAMILY_4",
+        "SCEN_0059_FAMILY_4",
+        "SCEN_0064_FAMILY_4",
+        "SCEN_0074_FAMILY_4",
+        "SCEN_0084_FAMILY_4",
+        "SCEN_0089_FAMILY_4",
+        "SCEN_0096_FAMILY_1",
+        "SCEN_0099_FAMILY_4"
+      ],
+      "val_scenarios": [
+        "SCEN_0014_FAMILY_4",
+        "SCEN_0039_FAMILY_4",
+        "SCEN_0094_FAMILY_4"
+      ],
+      "test_scenarios": [
+        "SCEN_0044_FAMILY_4"
+      ]
+    },
+    "localized_hotspot": {
+      "name": "Localized Hotspot (Temp Delta >= 2.0\u00b0C)",
+      "total_rows": 44784,
+      "total_scenarios": 73,
+      "train_scenarios_count": 54,
+      "val_scenarios_count": 8,
+      "test_scenarios_count": 11,
+      "train_scenarios": [
+        "SCEN_0001_FAMILY_1",
+        "SCEN_0002_FAMILY_2",
+        "SCEN_0004_FAMILY_4",
+        "SCEN_0005_FAMILY_5",
+        "SCEN_0006_FAMILY_1",
+        "SCEN_0007_FAMILY_2",
+        "SCEN_0011_FAMILY_1",
+        "SCEN_0013_FAMILY_3",
+        "SCEN_0015_FAMILY_5",
+        "SCEN_0021_FAMILY_1",
+        "SCEN_0024_FAMILY_4",
+        "SCEN_0025_FAMILY_5",
+        "SCEN_0026_FAMILY_1",
+        "SCEN_0027_FAMILY_2",
+        "SCEN_0028_FAMILY_3",
+        "SCEN_0030_FAMILY_5",
+        "SCEN_0031_FAMILY_1",
+        "SCEN_0033_FAMILY_3",
+        "SCEN_0035_FAMILY_5",
+        "SCEN_0042_FAMILY_2",
+        "SCEN_0046_FAMILY_1",
+        "SCEN_0047_FAMILY_2",
+        "SCEN_0048_FAMILY_3",
+        "SCEN_0049_FAMILY_4",
+        "SCEN_0050_FAMILY_5",
+        "SCEN_0051_FAMILY_1",
+        "SCEN_0055_FAMILY_5",
+        "SCEN_0060_FAMILY_5",
+        "SCEN_0062_FAMILY_2",
+        "SCEN_0063_FAMILY_3",
+        "SCEN_0064_FAMILY_4",
+        "SCEN_0065_FAMILY_5",
+        "SCEN_0066_FAMILY_1",
+        "SCEN_0068_FAMILY_3",
+        "SCEN_0070_FAMILY_5",
+        "SCEN_0078_FAMILY_3",
+        "SCEN_0079_FAMILY_4",
+        "SCEN_0080_FAMILY_5",
+        "SCEN_0081_FAMILY_1",
+        "SCEN_0082_FAMILY_2",
+        "SCEN_0083_FAMILY_3",
+        "SCEN_0084_FAMILY_4",
+        "SCEN_0085_FAMILY_5",
+        "SCEN_0086_FAMILY_1",
+        "SCEN_0087_FAMILY_2",
+        "SCEN_0088_FAMILY_3",
+        "SCEN_0089_FAMILY_4",
+        "SCEN_0090_FAMILY_5",
+        "SCEN_0091_FAMILY_1",
+        "SCEN_0093_FAMILY_3",
+        "SCEN_0097_FAMILY_2",
+        "SCEN_0098_FAMILY_3",
+        "SCEN_0099_FAMILY_4",
+        "SCEN_0100_FAMILY_5"
+      ],
+      "val_scenarios": [
+        "SCEN_0020_FAMILY_5",
+        "SCEN_0036_FAMILY_1",
+        "SCEN_0040_FAMILY_5",
+        "SCEN_0052_FAMILY_2",
+        "SCEN_0057_FAMILY_2",
+        "SCEN_0071_FAMILY_1",
+        "SCEN_0076_FAMILY_1",
+        "SCEN_0095_FAMILY_5"
+      ],
+      "test_scenarios": [
+        "SCEN_0010_FAMILY_5",
+        "SCEN_0012_FAMILY_2",
+        "SCEN_0022_FAMILY_2",
+        "SCEN_0029_FAMILY_4",
+        "SCEN_0045_FAMILY_5",
+        "SCEN_0053_FAMILY_3",
+        "SCEN_0054_FAMILY_4",
+        "SCEN_0056_FAMILY_1",
+        "SCEN_0061_FAMILY_1",
+        "SCEN_0072_FAMILY_2",
+        "SCEN_0075_FAMILY_5"
+      ]
+    },
+    "opposing_zones": {
+      "name": "Opposing Thermal Zones",
+      "total_rows": 14400,
+      "total_scenarios": 20,
+      "train_scenarios_count": 14,
+      "val_scenarios_count": 3,
+      "test_scenarios_count": 3,
+      "train_scenarios": [
+        "SCEN_0005_FAMILY_5",
+        "SCEN_0015_FAMILY_5",
+        "SCEN_0025_FAMILY_5",
+        "SCEN_0030_FAMILY_5",
+        "SCEN_0035_FAMILY_5",
+        "SCEN_0050_FAMILY_5",
+        "SCEN_0055_FAMILY_5",
+        "SCEN_0060_FAMILY_5",
+        "SCEN_0065_FAMILY_5",
+        "SCEN_0070_FAMILY_5",
+        "SCEN_0080_FAMILY_5",
+        "SCEN_0085_FAMILY_5",
+        "SCEN_0090_FAMILY_5",
+        "SCEN_0100_FAMILY_5"
+      ],
+      "val_scenarios": [
+        "SCEN_0020_FAMILY_5",
+        "SCEN_0040_FAMILY_5",
+        "SCEN_0095_FAMILY_5"
+      ],
+      "test_scenarios": [
+        "SCEN_0010_FAMILY_5",
+        "SCEN_0045_FAMILY_5",
+        "SCEN_0075_FAMILY_5"
+      ]
+    }
+  }
+}

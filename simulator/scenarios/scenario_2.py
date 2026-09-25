@@ -36,21 +36,29 @@ class Scenario2OccupancyConcentration(BaseScenario):
     ) -> TimestepInput:
         rand_val = lambda low, high: float(rng.uniform(low, high)) if rng else (low + high) / 2.0
 
-        # All 10 computers perform similar moderate/light workloads (18-28% CPU, 2-10% GPU)
+        # Continuous smooth thermal wave (no discrete random jitter)
+        wave = lambda cid, phase=0.0: float(np.sin(2.0 * np.pi * t_seconds / 260.0 + cid + phase))
+
+        # All 10 computers perform similar moderate/light workloads (18-26% CPU, 4-10% GPU)
+        comp_baselines = {
+            1: (22.0, 6.0), 2: (20.5, 5.0), 3: (23.0, 7.5), 4: (21.5, 5.5),
+            5: (19.0, 4.5), 6: (24.0, 8.0), 7: (22.5, 6.5), 8: (21.0, 5.0),
+            9: (20.0, 4.8), 10: (23.5, 7.0),
+        }
         workloads: Dict[int, Tuple[float, float]] = {}
-        for cid in range(1, 11):
-            cpu = 22.0 + rand_val(-4.0, 5.0)
-            gpu = 5.0 + rand_val(-3.0, 4.0)
+        for cid, (base_cpu, base_gpu) in comp_baselines.items():
+            cpu = base_cpu + 0.7 * wave(cid)
+            gpu = base_gpu + 0.5 * wave(cid, phase=0.8)
             workloads[cid] = (round(min(max(cpu, 5.0), 40.0), 2), round(min(max(gpu, 0.0), 20.0), 2))
 
-        # Occupancy gathering in Zone 3: ramps up from t=300s to t=900s
-        ramp = self.smooth_ramp(t_seconds, 300.0, 900.0, 0.0, 1.0)
+        # Occupancy gathering in Zone 3: ramps up smoothly from t=0s to t=200s
+        ramp = self.smooth_ramp(t_seconds, 0.0, 200.0, 0.0, 1.0)
         
-        # Zone 3 surges to 16 occupants (meeting/seminar)
+        # Zone 3 surges to 16 occupants (meeting/presentation)
         z3_occ = int(round(3 + ramp * 13))
-        z1_occ = max(1, int(round(2 + rand_val(-0.5, 0.5))))
-        z2_occ = max(1, int(round(2 + rand_val(-0.5, 0.5))))
-        z4_occ = max(1, int(round(2 + rand_val(-0.5, 0.5))))
+        z1_occ = 2
+        z2_occ = 2
+        z4_occ = 2
 
         occupancy = {
             "ZONE_1": z1_occ,

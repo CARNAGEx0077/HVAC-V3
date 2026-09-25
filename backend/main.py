@@ -21,6 +21,8 @@ from backend.occupancy.detector import YoloDetector
 from backend.occupancy.tracker import PersonTracker
 from backend.occupancy.engine import OccupancyEngine
 from backend.api import routes, websocket
+from backend.simulation import router as simulation_router
+from ml.brain_api import router as brain_router
 
 # Configure logging format
 logging.basicConfig(
@@ -120,6 +122,8 @@ app.add_middleware(
 # Register REST and WebSocket routers
 app.include_router(routes.router)
 app.include_router(websocket.router)
+app.include_router(simulation_router.router)
+app.include_router(brain_router)
 
 # Mount frontend static files
 frontend_path = config.FRONTEND_DIR

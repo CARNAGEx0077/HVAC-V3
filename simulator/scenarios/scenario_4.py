@@ -36,21 +36,27 @@ class Scenario4HighOccupancyLowCompute(BaseScenario):
     ) -> TimestepInput:
         rand_val = lambda low, high: float(rng.uniform(low, high)) if rng else (low + high) / 2.0
 
-        # All 10 computers idle/simple (8-14% CPU, 0-3% GPU)
+        # All 10 computers idle/simple (8-14% CPU, 1-3% GPU) with smooth continuous wave
+        wave = lambda cid, phase=0.0: float(np.sin(2.0 * np.pi * t_seconds / 250.0 + cid + phase))
+        idle_baselines = {
+            1: (10.0, 2.0), 2: (9.0, 1.5), 3: (11.0, 2.5), 4: (9.5, 1.8),
+            5: (8.5, 1.2), 6: (12.0, 3.0), 7: (10.5, 2.2), 8: (9.0, 1.6),
+            9: (8.0, 1.0), 10: (11.5, 2.8),
+        }
         workloads: Dict[int, Tuple[float, float]] = {}
-        for cid in range(1, 11):
-            cpu = 10.0 + rand_val(-3.0, 3.0)
-            gpu = 2.0 + rand_val(-1.0, 2.0)
+        for cid, (base_cpu, base_gpu) in idle_baselines.items():
+            cpu = base_cpu + 0.5 * wave(cid)
+            gpu = base_gpu + 0.3 * wave(cid, phase=0.7)
             workloads[cid] = (round(min(max(cpu, 5.0), 20.0), 2), round(min(max(gpu, 0.0), 10.0), 2))
 
-        # Occupancy fills the room: ramps up between t=180s and t=600s
-        ramp = self.smooth_ramp(t_seconds, 180.0, 600.0, 0.0, 1.0)
+        # Occupancy fills the room: ramps up smoothly between t=0s and t=200s
+        ramp = self.smooth_ramp(t_seconds, 0.0, 200.0, 0.0, 1.0)
 
-        # 8-9 people per zone -> 34 people total (~2900 W metabolic heat vs ~550 W computer heat)
-        z1_occ = int(round(3 + ramp * 5 + rand_val(-0.4, 0.4)))
-        z2_occ = int(round(3 + ramp * 6 + rand_val(-0.4, 0.4)))
-        z3_occ = int(round(3 + ramp * 6 + rand_val(-0.4, 0.4)))
-        z4_occ = int(round(3 + ramp * 5 + rand_val(-0.4, 0.4)))
+        # 8-9 people per zone -> 34 people total (~2900 W metabolic heat vs ~600 W computer heat)
+        z1_occ = int(round(3 + ramp * 5))
+        z2_occ = int(round(3 + ramp * 6))
+        z3_occ = int(round(3 + ramp * 6))
+        z4_occ = int(round(3 + ramp * 5))
 
         occupancy = {
             "ZONE_1": z1_occ,

@@ -1,0 +1,114 @@
+{
+  "total_rows_analyzed": 72000,
+  "scenario_family_distribution": {
+    "FAMILY_1": 14400,
+    "FAMILY_2": 14400,
+    "FAMILY_3": 14400,
+    "FAMILY_4": 14400,
+    "FAMILY_5": 14400
+  },
+  "label_reason_distribution": {
+    "REDUCE_ENERGY": 17986,
+    "HIGH_COMPUTE_LOAD": 24776,
+    "HIGH_OCCUPANCY": 23040,
+    "COMFORT_ENERGY_BALANCE": 4355,
+    "LOCALIZED_ZONE_COOLING": 1843
+  },
+  "metrics_summary": {
+    "occupancy": {
+      "min": 0.0,
+      "p25": 12.0,
+      "median": 15.0,
+      "mean": 16.36,
+      "p75": 19.0,
+      "max": 36.0,
+      "std": 6.5
+    },
+    "cpu_utilization_percent": {
+      "min": 3.0,
+      "p25": 19.79,
+      "median": 40.12,
+      "mean": 49.76,
+      "p75": 87.0,
+      "max": 98.0,
+      "std": 33.27
+    },
+    "gpu_utilization_percent": {
+      "min": 0.0,
+      "p25": 9.44,
+      "median": 22.4,
+      "mean": 43.15,
+      "p75": 86.8,
+      "max": 98.0,
+      "std": 37.7
+    },
+    "outdoor_temperature_c": {
+      "min": 32.06,
+      "p25": 36.19,
+      "median": 38.63,
+      "mean": 38.34,
+      "p75": 40.54,
+      "max": 42.0,
+      "std": 2.64
+    },
+    "humidity_percent": {
+      "min": 45.0,
+      "p25": 50.74,
+      "median": 57.31,
+      "mean": 57.27,
+      "p75": 62.4,
+      "max": 77.6,
+      "std": 7.94
+    },
+    "room_average_temperature_c": {
+      "min": 23.05,
+      "p25": 24.11,
+      "median": 24.81,
+      "mean": 24.9,
+      "p75": 25.53,
+      "max": 28.31,
+      "std": 1.08
+    },
+    "total_heat_load_watts": {
+      "min": 3637.9,
+      "p25": 5507.84,
+      "median": 6014.41,
+      "mean": 6084.28,
+      "p75": 6797.87,
+      "max": 8231.45,
+      "std": 969.02
+    },
+    "optimal_room_setpoint_c": {
+      "min": 24.5,
+      "p25": 25.5,
+      "median": 25.5,
+      "mean": 25.63,
+      "p75": 26.0,
+      "max": 26.5,
+      "std": 0.52
+    }
+  },
+  "optimal_setpoint_breakdown": {
+    "24.5": {
+      "count": 6528,
+      "percent": 9.07
+    },
+    "25.0": {
+      "count": 4695,
+      "percent": 6.52
+    },
+    "25.5": {
+      "count": 30832,
+      "percent": 42.82
+    },
+    "26.0": {
+      "count": 22864,
+      "percent": 31.76
+    },
+    "26.5": {
+      "count": 7081,
+      "percent": 9.83
+    }
+  },
+  "concentration_warnings": []
+}

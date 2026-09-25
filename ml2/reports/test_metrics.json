@@ -1,0 +1,18 @@
+{
+  "model_name": "Random Forest",
+  "split_name": "test",
+  "sample_count": 10800,
+  "accuracy": 0.7681481481481481,
+  "balanced_accuracy": 0.6808539272089976,
+  "macro_f1": 0.6471353912849092,
+  "weighted_f1": 0.7110906818000648,
+  "mae_deg_c": 0.1164,
+  "rmse_deg_c": 0.2422,
+  "pct_within_0_5_c": 99.91,
+  "pct_within_1_0_c": 100.0,
+  "max_absolute_error_c": 1.0,
+  "median_absolute_error_c": 0.0,
+  "rare_24_5_recall": 1.0,
+  "rare_26_5_recall": 0.4797,
+  "mean_changes_per_scenario": 13.6
+}
