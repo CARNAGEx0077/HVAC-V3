@@ -434,13 +434,13 @@
     const speed = sim.speed || 10;
     const isPitch = sim.pitchMode || false;
 
-    // 1. Engineering Header
+    // 1. Engineering Workstation Header & Metadata Strip
     const header = `
       <div class="sim-workstation-header">
         <div class="sw-brand-group">
-          <span class="sw-brand-title">HVEAC</span>
+          <span class="sw-brand-title">HVEAC V3</span>
           <span class="sw-brand-sep">|</span>
-          <span class="sw-brand-sub">Simulation Lab</span>
+          <span class="sw-brand-sub">SIMULATION LAB</span>
           <span class="sw-tag">THERMAL WORKSTATION</span>
         </div>
         <div class="sw-header-meta">
@@ -451,39 +451,44 @@
       </div>
     `;
 
-    // Scenario meta catalog
+    // 5 Calibrated Scenarios Metadata
     const scenarios = [
       {
         id: 1,
-        title: 'SCENARIO 01 — Localized Heavy Compute',
+        code: 'SCENARIO 01',
+        title: 'Localized Heavy Compute',
         desc: 'Cluster of 4 computers in Zone 1 (NW) executes heavy batch compute while others idle with baseline occupancy.',
-        source: 'Compute cluster (Zone 1)',
-        result: 'Localized thermal hotspot'
+        source: 'Computer cluster (Zone 1)',
+        result: 'Localized cooling demand'
       },
       {
         id: 2,
-        title: 'SCENARIO 02 — Occupancy Concentration',
+        code: 'SCENARIO 02',
+        title: 'Occupancy Concentration',
         desc: 'All 10 computers maintain uniform light workloads while 16 occupants gather in Zone 3 (SE).',
         source: 'Human occupancy (Zone 3)',
         result: 'Localized metabolic heat'
       },
       {
         id: 3,
-        title: 'SCENARIO 03 — Distributed Heavy Compute',
+        code: 'SCENARIO 03',
+        title: 'Distributed Heavy Compute',
         desc: 'All 10 computers spatially distributed across all 4 zones run heavy batch workloads simultaneously.',
         source: 'Distributed compute (10 nodes)',
         result: 'Uniform room-wide heat influx'
       },
       {
         id: 4,
-        title: 'SCENARIO 04 — High Occupancy / Low Compute',
+        code: 'SCENARIO 04',
+        title: 'High Occupancy / Low Compute',
         desc: 'Seminar setting with 34 occupants distributed room-wide with minimal computer workload.',
         source: 'Human occupancy (Room-wide)',
         result: 'Metabolic heat dominance'
       },
       {
         id: 5,
-        title: 'SCENARIO 05 — Opposing Thermal Zones',
+        code: 'SCENARIO 05',
+        title: 'Opposing Thermal Zones',
         desc: 'West side loaded with heavy compute nodes; East side loaded with 20+ occupants under light compute.',
         source: 'Dual source (West Compute / East Occupancy)',
         result: 'Opposing thermal zones'
@@ -492,20 +497,24 @@
 
     const currentScenario = scenarios.find(s => s.id === activeId) || scenarios[0];
 
-    // 2. Compact Engineering Toolbar
-    const toolbar = `
-      <div class="sim-toolbar ${isPitch ? 'sim-toolbar-pitch' : ''}">
-        <div class="sim-toolbar-left">
-          <div class="sim-scenario-field">
-            <span class="field-label">Scenario:</span>
-            <span class="field-val" id="sim-active-title">${currentScenario.title}</span>
-          </div>
-          <div class="sim-status-badge status-${status.toLowerCase()}" id="sim-status-badge">
-            ${status === 'RUNNING' ? '● RUNNING' : status === 'PAUSED' ? '❚❚ PAUSED' : status === 'COMPLETED' ? '✔ COMPLETED' : '○ READY'}
+    // 2. Control Mode Bar & Simulation Playback Toolbar
+    const controlModeBar = `
+      <div class="sim-control-mode-bar ${isPitch ? 'mode-pitch' : ''}">
+        <div class="control-mode-left">
+          <span class="ctrl-mode-lbl">CONTROL MODE</span>
+          <span class="mode-badge-prototype" id="btn-mode-prototype">PROTOTYPE CONTROL</span>
+          <div class="status-chip-group">
+            <span class="status-chip status-chip-active">STATUS: ACTIVE</span>
+            <span class="status-chip status-chip-ctrl">CONTROLLER: THERMAL CONTROL ALGORITHM</span>
+            <span class="status-chip status-chip-ai">AI MODEL: NOT INTEGRATED</span>
           </div>
         </div>
 
-        <div class="sim-toolbar-center">
+        <div class="control-mode-right">
+          <div class="sim-scenario-field">
+            <span class="field-label">Scenario:</span>
+            <span class="field-val" id="sim-active-title">${currentScenario.code} – ${currentScenario.title}</span>
+          </div>
           <button class="btn-eng ${status === 'RUNNING' ? 'btn-eng-amber' : 'btn-eng-primary'}" id="btn-sim-play-pause">
             ${status === 'RUNNING' ? 'Pause' : 'Start'}
           </button>
@@ -519,13 +528,15 @@
               <button class="btn-speed ${speed === s ? 'active' : ''}" data-speed="${s}">${s}x</button>
             `).join('')}
           </div>
-        </div>
 
-        <div class="sim-toolbar-right">
           <div class="sim-time-field">
-            <span class="time-label">Simulation:</span>
             <span class="time-val" id="sim-clock-display">00:00:00 / 02:00:00</span>
           </div>
+
+          <div class="sim-status-badge status-${status.toLowerCase()}" id="sim-status-badge">
+            ${status === 'RUNNING' ? '● RUNNING' : status === 'PAUSED' ? '❚❚ PAUSED' : status === 'COMPLETED' ? '✔ COMPLETED' : '○ READY'}
+          </div>
+
           <button class="btn-eng btn-eng-subtle ${isPitch ? 'active' : ''}" id="btn-sim-pitch">
             ${isPitch ? 'Exit Pitch' : 'Pitch Mode'}
           </button>
@@ -534,12 +545,61 @@
           </button>
         </div>
       </div>
+
       <div class="sim-progress-bar-container">
         <div class="sim-progress-bar" id="sim-progress-bar" style="width: 0%;"></div>
       </div>
     `;
 
-    // Fixed computer coordinate definitions (relative percentages inside 12m x 10m room)
+    // 3. System Status Strip (Section 10)
+    const statusStrip = `
+      <div class="sim-status-strip">
+        <div class="status-strip-item">
+          <span class="status-strip-lbl">CONTROL AUTHORITY</span>
+          <span class="status-strip-val" id="ctrl-authority" style="color: #58a6ff;">THERMAL CONTROL ALGORITHM</span>
+        </div>
+        <div class="status-strip-item">
+          <span class="status-strip-lbl">SAFETY GOVERNOR</span>
+          <span class="status-strip-val" id="ctrl-safety-status" style="color: #3fb950;">ACTIVE</span>
+        </div>
+        <div class="status-strip-item">
+          <span class="status-strip-lbl">AI MODEL</span>
+          <span class="status-strip-val" style="color: #d29922;">NOT INTEGRATED</span>
+        </div>
+        <div class="status-strip-item">
+          <span class="status-strip-lbl">COMFORT TARGET</span>
+          <span class="status-strip-val" id="ctrl-comfort-target" style="color: #e6edf3;">23.5°C</span>
+        </div>
+      </div>
+    `;
+
+    // 4. KPI Cards Row (Section 11)
+    const kpiRow = `
+      <div class="sim-kpi-row">
+        <div class="sim-kpi-card">
+          <span class="kpi-label">ROOM TEMPERATURE</span>
+          <div class="kpi-value" id="ctrl-room-temp">22.5°C</div>
+          <span class="kpi-sub">Average across 4 zones</span>
+        </div>
+        <div class="sim-kpi-card">
+          <span class="kpi-label">ROOM COOLING DEMAND</span>
+          <div class="kpi-value" id="ctrl-room-demand" style="color: #58a6ff;">0%</div>
+          <span class="kpi-sub">Average zone demand</span>
+        </div>
+        <div class="sim-kpi-card">
+          <span class="kpi-label">ROOM SETPOINT</span>
+          <div class="kpi-value" id="ctrl-room-setpoint" style="color: #3fb950;">24.0°C</div>
+          <span class="kpi-sub">Deterministic mapping from demand</span>
+        </div>
+        <div class="sim-kpi-card">
+          <span class="kpi-label">CONTROLLER</span>
+          <div class="kpi-value" style="font-size: 16px; color: #58a6ff; line-height: 1.3;">THERMAL CONTROL ALGORITHM</div>
+          <span class="kpi-sub" id="ctrl-fallback-status" style="color: #3fb950;">NORMAL • SINGLE DECISION-MAKER</span>
+        </div>
+      </div>
+    `;
+
+    // 5. Technical CAD Floorplan Stage (Section 29)
     const fixedCompDefs = [
       { id: 1, name: 'C1', left: '16.7%', top: '20%', zone: 'ZONE_1' },
       { id: 2, name: 'C2', left: '33.3%', top: '20%', zone: 'ZONE_1' },
@@ -553,7 +613,6 @@
       { id: 10, name: 'C10', left: '16.7%', top: '65%', zone: 'ZONE_4' }
     ];
 
-    // 3. Technical Floorplan Stage
     const roomViewport = `
       <div class="sim-room-container ${isPitch ? 'sim-room-pitch' : ''}">
         <div class="sim-room-header">
@@ -565,10 +624,9 @@
         </div>
 
         <div class="sim-room-stage" id="sim-room-stage">
-          <!-- Dynamic Canvas Heatmap Underlay -->
           <canvas id="sim-heatmap-canvas" class="sim-heatmap-canvas" width="640" height="533"></canvas>
 
-          <!-- 4 Wall-mounted AC Units (Technical Boundary Blocks) -->
+          <!-- 4 Wall-mounted AC Units -->
           <div class="sim-ac-unit ac-north" id="sim-ac-north" title="AC-1 (North Wall)">
             <span class="ac-tag">AC1 NORTH</span>
             <span class="ac-val" id="sim-ac-north-val">22.0°C | 25% | IDLE</span>
@@ -604,7 +662,7 @@
             <div class="zone-temp-telemetry" id="sim-tag-z4">22.5 °C</div>
           </div>
 
-          <!-- 10 Fixed Workstation Markers (Technical CAD Blocks) -->
+          <!-- 10 Fixed Workstation Markers -->
           ${fixedCompDefs.map(c => `
             <div class="sim-workstation" id="sim-comp-${c.id}" style="left: ${c.left}; top: ${c.top};" data-comp-id="${c.id}" title="Click to inspect node ${c.name}">
               <div class="comp-aura" id="sim-aura-${c.id}"></div>
@@ -615,25 +673,23 @@
             </div>
           `).join('')}
 
-          <!-- Workstation Hover Tooltip -->
           <div class="sim-comp-tooltip" id="sim-comp-tooltip" style="display: none;">
             <div class="tooltip-header" id="sim-tt-title">Computer 1</div>
-            <div class="tooltip-row"><span>Zone:</span> <strong id="sim-tt-zone">ZONE_1</strong></div>
-            <div class="tooltip-row"><span>CPU:</span> <strong id="sim-tt-cpu">15%</strong></div>
-            <div class="tooltip-row"><span>GPU:</span> <strong id="sim-tt-gpu">0%</strong></div>
-            <div class="tooltip-row"><span>Workload:</span> <strong id="sim-tt-workload">IDLE</strong></div>
-            <div class="tooltip-row"><span>Heat:</span> <strong id="sim-tt-heat">55 W</strong></div>
+            <div class="tooltip-meta"><span id="sim-tt-zone">Zone 1 (NW)</span></div>
+            <div class="tooltip-row"><span>CPU:</span> <strong id="sim-tt-cpu">20%</strong></div>
+            <div class="tooltip-row"><span>GPU:</span> <strong id="sim-tt-gpu">10%</strong></div>
+            <div class="tooltip-row"><span>Workload:</span> <strong id="sim-tt-workload">LIGHT</strong></div>
+            <div class="tooltip-row"><span>Heat:</span> <strong id="sim-tt-heat">86.7 W</strong></div>
           </div>
         </div>
 
-        <!-- Integrated Scientific Thermal Scale -->
-        <div class="sim-heatmap-legend">
-          <div class="legend-scale-group">
+        <div class="sim-thermal-legend">
+          <div class="legend-scale">
             <span class="legend-val">20.0°C</span>
-            <div class="legend-bar-wrapper">
-              <div class="legend-gradient-bar"></div>
-              <div class="legend-ref-marker" style="left: 31.25%;">
-                <span class="ref-line"></span>
+            <div class="legend-bar">
+              <div class="legend-gradient"></div>
+              <div class="legend-target-marker" style="left: 31.25%;">
+                <div class="marker-line"></div>
                 <span class="ref-tag">22.5°C Comfort</span>
               </div>
             </div>
@@ -644,10 +700,10 @@
       </div>
     `;
 
-    // 4. Live Telemetry Monitor (Right Workstation Panel)
+    // 6. Live Telemetry Monitor & Heat Load Balance
     const monitorPanel = `
       <div class="sim-monitor-container">
-        <!-- 4 Telemetry KPI Blocks -->
+        <!-- Telemetry Summary Grid -->
         <div class="sim-kpi-grid">
           <div class="sim-kpi-block">
             <span class="kpi-label">ROOM AVG</span>
@@ -667,9 +723,9 @@
           </div>
         </div>
 
-        <!-- Zone Telemetry Table (Section 10) -->
+        <!-- Zone Telemetry Table -->
         <div class="sim-card-panel">
-          <div class="card-title-eng">ZONE TELEMETRY</div>
+          <div class="card-title-eng">ZONE METRICS SUMMARY</div>
           <table class="sim-zone-table">
             <thead>
               <tr>
@@ -708,7 +764,7 @@
           </table>
         </div>
 
-        <!-- Thermal Load Balance Ledger (Section 11) -->
+        <!-- Thermal Load Balance Ledger -->
         <div class="sim-card-panel">
           <div class="card-title-eng">THERMAL LOAD BALANCE</div>
           <div class="sim-budget-ledger">
@@ -736,190 +792,335 @@
           </div>
         </div>
 
-        <!-- Control Recommendation (Section 12 & 24 - Baseline Thermodynamic Recommendation) -->
-        <div class="sim-card-panel sim-rec-panel">
-          <div class="sim-rec-header">
-            <span class="card-title-eng">CONTROL RECOMMENDATION</span>
-            <span class="rec-action-badge" id="sim-target-action">ECO_MAINTAIN</span>
-          </div>
-          <div class="rec-content">
-            <div class="rec-row-primary">
-              <span class="rec-lbl">Recommended room setpoint:</span>
-              <span class="rec-val" id="sim-target-temp">22.5 °C</span>
-            </div>
-            <div class="rec-row-secondary">
-              <span class="rec-lbl-sub">Perimeter allocation:</span>
-              <span class="rec-val-acs" id="sim-target-acs">AC1: 25% | AC2: 25% | AC3: 25% | AC4: 25%</span>
-            </div>
-            <div class="rec-source-note">
-              <span class="source-lbl">Source:</span> Rule-based simulation baseline
-            </div>
-          </div>
-        </div>
-
-        <!-- 5-Minute Temperature History Chart (Section 13) -->
+        <!-- 5-Minute Temperature History Chart -->
         <div class="sim-card-panel">
           <div class="card-title-eng">5-MINUTE TEMPERATURE HISTORY</div>
           <div class="sim-canvas-wrapper">
-            <canvas id="sim-chart-canvas" width="520" height="160"></canvas>
+            <canvas id="sim-chart-canvas" width="520" height="150"></canvas>
           </div>
         </div>
       </div>
     `;
 
-    // 5. Computer Node Telemetry Table & Summary Section (Section 14 & 15)
-    const computerTelemetrySection = `
-      <div class="sim-nodes-section" id="sim-nodes-telemetry-section">
-        <div class="section-header-bar">
-          <div class="sh-title-group">
-            <h3 class="sh-title">COMPUTER TELEMETRY</h3>
-            <span class="sh-subtitle">Live simulated computational workloads and heat output across 10 cluster nodes</span>
-          </div>
+    // 7. Zone-Level Control Telemetry (Section 13)
+    const zoneTelemetrySection = `
+      <div class="sim-card-section">
+        <div class="card-section-header">
+          <span class="card-title-eng">ZONE-LEVEL CONTROL TELEMETRY</span>
+          <span class="card-subtitle-eng">Thermodynamic state and computed demand across 4 quadrants</span>
         </div>
-
-        <!-- Compact Summary Strip -->
-        <div class="sim-comp-summary-strip">
-          <div class="summary-metric">
-            <span class="sm-lbl">TOTAL NODES</span>
-            <span class="sm-val" id="sim-sum-total">10 / 10</span>
+        <div class="sim-zone-telemetry-grid">
+          <div class="zone-telemetry-card">
+            <div class="zone-card-header">
+              <span class="zone-card-name">ZONE 1</span>
+              <span class="zone-card-loc">NW</span>
+            </div>
+            <div class="zone-card-metrics">
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Temperature:</span> <span class="zone-metric-val" id="ctrl-z1-temp">22.5°C</span></div>
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Heat:</span> <span class="zone-metric-val" id="ctrl-z1-heat">0 W</span></div>
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Demand:</span> <span class="zone-metric-val" id="ctrl-z1-demand">0%</span></div>
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Trend:</span> <span class="zone-metric-val" id="ctrl-z1-trend">+0.00°C/min</span></div>
+            </div>
           </div>
-          <div class="summary-metric">
-            <span class="sm-lbl">HEAVY LOAD</span>
-            <span class="sm-val" id="sim-sum-heavy">0</span>
+          <div class="zone-telemetry-card">
+            <div class="zone-card-header">
+              <span class="zone-card-name">ZONE 2</span>
+              <span class="zone-card-loc">NE</span>
+            </div>
+            <div class="zone-card-metrics">
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Temperature:</span> <span class="zone-metric-val" id="ctrl-z2-temp">22.5°C</span></div>
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Heat:</span> <span class="zone-metric-val" id="ctrl-z2-heat">0 W</span></div>
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Demand:</span> <span class="zone-metric-val" id="ctrl-z2-demand">0%</span></div>
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Trend:</span> <span class="zone-metric-val" id="ctrl-z2-trend">+0.00°C/min</span></div>
+            </div>
           </div>
-          <div class="summary-metric">
-            <span class="sm-lbl">ACTIVE NODES</span>
-            <span class="sm-val" id="sim-sum-active">10</span>
+          <div class="zone-telemetry-card">
+            <div class="zone-card-header">
+              <span class="zone-card-name">ZONE 3</span>
+              <span class="zone-card-loc">SE</span>
+            </div>
+            <div class="zone-card-metrics">
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Temperature:</span> <span class="zone-metric-val" id="ctrl-z3-temp">22.5°C</span></div>
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Heat:</span> <span class="zone-metric-val" id="ctrl-z3-heat">0 W</span></div>
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Demand:</span> <span class="zone-metric-val" id="ctrl-z3-demand">0%</span></div>
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Trend:</span> <span class="zone-metric-val" id="ctrl-z3-trend">+0.00°C/min</span></div>
+            </div>
           </div>
-          <div class="summary-metric">
-            <span class="sm-lbl">TOTAL COMPUTE HEAT</span>
-            <span class="sm-val" id="sim-sum-heat">850.0 W</span>
+          <div class="zone-telemetry-card">
+            <div class="zone-card-header">
+              <span class="zone-card-name">ZONE 4</span>
+              <span class="zone-card-loc">SW</span>
+            </div>
+            <div class="zone-card-metrics">
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Temperature:</span> <span class="zone-metric-val" id="ctrl-z4-temp">22.5°C</span></div>
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Heat:</span> <span class="zone-metric-val" id="ctrl-z4-heat">0 W</span></div>
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Demand:</span> <span class="zone-metric-val" id="ctrl-z4-demand">0%</span></div>
+              <div class="zone-metric-row"><span class="zone-metric-lbl">Trend:</span> <span class="zone-metric-val" id="ctrl-z4-trend">+0.00°C/min</span></div>
+            </div>
           </div>
-          <div class="summary-metric">
-            <span class="sm-lbl">AVERAGE CPU</span>
-            <span class="sm-val" id="sim-sum-avg-cpu">20.0%</span>
-          </div>
-          <div class="summary-metric">
-            <span class="sm-lbl">AVERAGE GPU</span>
-            <span class="sm-val" id="sim-sum-avg-gpu">10.0%</span>
-          </div>
-        </div>
-
-        <!-- Selected Node Telemetry Inspector -->
-        <div class="sim-selected-inspector" id="sim-selected-inspector" style="display: none;">
-          <div class="si-left">
-            <span class="si-tag">SELECTED NODE:</span>
-            <strong class="si-name" id="sim-insp-name">Computer 1</strong>
-            <span class="si-zone" id="sim-insp-zone">Zone 1 (NW)</span>
-          </div>
-          <div class="si-metrics">
-            <div class="si-metric"><span class="si-lbl">CPU:</span> <strong id="sim-insp-cpu">20.0%</strong> <span class="trend-icon" id="sim-insp-cputrend">→</span></div>
-            <div class="si-metric"><span class="si-lbl">GPU:</span> <strong id="sim-insp-gpu">10.0%</strong></div>
-            <div class="si-metric"><span class="si-lbl">WORKLOAD:</span> <span class="status-tag" id="sim-insp-cat">LIGHT</span></div>
-            <div class="si-metric"><span class="si-lbl">HEAT:</span> <strong id="sim-insp-heat">86.7 W</strong> <span class="trend-tag" id="sim-insp-heattrend">STABLE</span></div>
-            <div class="si-metric"><span class="si-lbl">CONTRIBUTION:</span> <span class="contrib-tag" id="sim-insp-contrib">LOW</span></div>
-            <div class="si-metric"><span class="si-lbl">STATUS:</span> <span class="status-tag" id="sim-insp-status">RUNNING</span></div>
-          </div>
-          <button class="btn-eng btn-eng-subtle btn-xs" id="btn-deselect-node">Deselect</button>
-        </div>
-
-        <!-- Telemetry Table (Section 14 & 15) -->
-        <div class="sim-table-wrapper">
-          <table class="sim-nodes-table" id="sim-nodes-table">
-            <thead>
-              <tr>
-                <th style="width: 70px;">ID</th>
-                <th style="width: 110px;">ZONE</th>
-                <th style="width: 140px;">CPU</th>
-                <th style="width: 120px;">WORKLOAD</th>
-                <th style="width: 130px;">GPU</th>
-                <th style="width: 140px; text-align: right;">HEAT</th>
-                <th style="width: 140px;">THERMAL LOAD</th>
-                <th style="width: 110px;">STATUS</th>
-                <th style="width: 80px; text-align: center;">ACTION</th>
-              </tr>
-            </thead>
-            <tbody id="sim-nodes-tbody">
-              ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(id => {
-      const zoneName = id <= 4 ? 'Z1 NW' : (id <= 6 ? 'Z2 NE' : (id <= 8 ? 'Z3 SE' : 'Z4 SW'));
-      return `
-                  <tr class="sim-node-row" id="sim-row-c${id}" data-comp-id="${id}">
-                    <td class="cell-node-id"><strong>C${id}</strong></td>
-                    <td class="cell-zone" id="sim-row-zone-${id}">${zoneName}</td>
-                    <td class="cell-cpu">
-                      <div class="val-bar-group">
-                        <span class="cell-num-fixed" id="sim-row-cpu-${id}">20.0%</span>
-                        <span class="trend-icon" id="sim-row-cputrend-${id}">→</span>
-                        <div class="eng-inline-bar"><div class="bar-fill" id="sim-row-cpubar-${id}" style="width: 20%;"></div></div>
-                      </div>
-                    </td>
-                    <td class="cell-workload">
-                      <span class="status-tag status-light" id="sim-row-cat-${id}">LIGHT</span>
-                    </td>
-                    <td class="cell-gpu">
-                      <div class="val-bar-group">
-                        <span class="cell-num-fixed" id="sim-row-gpu-${id}">10.0%</span>
-                        <div class="eng-inline-bar"><div class="bar-fill" id="sim-row-gpubar-${id}" style="width: 10%;"></div></div>
-                      </div>
-                    </td>
-                    <td class="cell-heat" style="text-align: right;">
-                      <span class="cell-num-fixed" id="sim-row-heat-${id}">86.7 W</span>
-                      <span class="trend-tag trend-stable" id="sim-row-heattrend-${id}">STABLE</span>
-                    </td>
-                    <td class="cell-contrib">
-                      <span class="contrib-tag contrib-low" id="sim-row-contrib-${id}">LOW</span>
-                    </td>
-                    <td class="cell-status">
-                      <span class="status-tag status-running" id="sim-row-status-${id}">RUNNING</span>
-                    </td>
-                    <td class="cell-action" style="text-align: center;">
-                      <button class="btn-eng btn-eng-subtle btn-xs btn-inspect-node" data-comp-id="${id}">Select</button>
-                    </td>
-                  </tr>
-                `;
-    }).join('')}
-            </tbody>
-          </table>
         </div>
       </div>
     `;
 
-    // 6. Technical Scenario Selector (Section 16)
+    // 8. AC-Level Control Output (Section 14)
+    const acTelemetrySection = `
+      <div class="sim-card-section">
+        <div class="card-section-header">
+          <span class="card-title-eng">AC-LEVEL CONTROL OUTPUT</span>
+          <span class="card-subtitle-eng">Perimeter unit actuation levels mapped through spatial influence matrix</span>
+        </div>
+        <div class="sim-ac-telemetry-grid">
+          <div class="ac-telemetry-card">
+            <div class="ac-card-header">
+              <span class="ac-card-name">AC1</span>
+              <span class="ac-card-wall">NORTH</span>
+            </div>
+            <div class="ac-card-primary">
+              <div class="ac-cooling-lbl">Cooling</div>
+              <div class="ac-cooling-val" id="ctrl-ac1-cooling">0%</div>
+            </div>
+            <div class="ac-setpoint-row">
+              <span>Setpoint</span>
+              <span class="ac-sp-val" id="ctrl-ac1-sp">24.0°C</span>
+            </div>
+          </div>
+          <div class="ac-telemetry-card">
+            <div class="ac-card-header">
+              <span class="ac-card-name">AC2</span>
+              <span class="ac-card-wall">EAST</span>
+            </div>
+            <div class="ac-card-primary">
+              <div class="ac-cooling-lbl">Cooling</div>
+              <div class="ac-cooling-val" id="ctrl-ac2-cooling">0%</div>
+            </div>
+            <div class="ac-setpoint-row">
+              <span>Setpoint</span>
+              <span class="ac-sp-val" id="ctrl-ac2-sp">24.0°C</span>
+            </div>
+          </div>
+          <div class="ac-telemetry-card">
+            <div class="ac-card-header">
+              <span class="ac-card-name">AC3</span>
+              <span class="ac-card-wall">SOUTH</span>
+            </div>
+            <div class="ac-card-primary">
+              <div class="ac-cooling-lbl">Cooling</div>
+              <div class="ac-cooling-val" id="ctrl-ac3-cooling">0%</div>
+            </div>
+            <div class="ac-setpoint-row">
+              <span>Setpoint</span>
+              <span class="ac-sp-val" id="ctrl-ac3-sp">24.0°C</span>
+            </div>
+          </div>
+          <div class="ac-telemetry-card">
+            <div class="ac-card-header">
+              <span class="ac-card-name">AC4</span>
+              <span class="ac-card-wall">WEST</span>
+            </div>
+            <div class="ac-card-primary">
+              <div class="ac-cooling-lbl">Cooling</div>
+              <div class="ac-cooling-val" id="ctrl-ac4-cooling">0%</div>
+            </div>
+            <div class="ac-setpoint-row">
+              <span>Setpoint</span>
+              <span class="ac-sp-val" id="ctrl-ac4-sp">24.0°C</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // 9. Runtime Control Pipeline (Sections 15, 16, 17, 18 — Decision Trace Replacement)
+    const pipelineSection = `
+      <div class="sim-pipeline-section">
+        <div class="card-section-header">
+          <span class="card-title-eng">RUNTIME CONTROL PIPELINE</span>
+          <span class="card-subtitle-eng">Deterministic single-authority flow • No secondary decision-maker</span>
+        </div>
+        <div class="sim-pipeline-grid">
+          <div class="pipeline-step-card">
+            <div class="pipeline-step-header">
+              <span class="pipeline-step-num">01</span>
+              <span class="pipeline-step-title">THERMAL SENSORS</span>
+            </div>
+            <span class="pipeline-step-desc">Live zone temperatures and thermal loads</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-step-card">
+            <div class="pipeline-step-header">
+              <span class="pipeline-step-num">02</span>
+              <span class="pipeline-step-title">THERMAL CONTROL ALGORITHM</span>
+            </div>
+            <span class="pipeline-step-desc">Calculated zone cooling demand</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-step-card">
+            <div class="pipeline-step-header">
+              <span class="pipeline-step-num">03</span>
+              <span class="pipeline-step-title">SAFETY GOVERNOR</span>
+            </div>
+            <span class="pipeline-step-desc">Commands validated & limits enforced</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-step-card">
+            <div class="pipeline-step-header">
+              <span class="pipeline-step-num">04</span>
+              <span class="pipeline-step-title">HVAC ACTUATION</span>
+            </div>
+            <span class="pipeline-step-desc">AC1–AC4 perimeter commands applied</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-step-card">
+            <div class="pipeline-step-header">
+              <span class="pipeline-step-num">05</span>
+              <span class="pipeline-step-title">THERMAL RESPONSE</span>
+            </div>
+            <span class="pipeline-step-desc">Zone temperatures & heat balance updated</span>
+          </div>
+        </div>
+
+        <!-- Live Decision Details (Section 18) -->
+        <div class="sim-decision-summary-card">
+          <span class="decision-summary-label">CURRENT DECISION</span>
+          <span class="decision-summary-value" id="ctrl-current-decision">Room: 22.5°C  |  Average demand: 0%  |  AC1: 0%  |  AC2: 0%  |  AC3: 0%  |  AC4: 0%</span>
+        </div>
+      </div>
+    `;
+
+    // 10. Scenario Catalog (Sections 19, 20, 21)
     const scenarioCards = `
       <div class="sim-scenarios-section">
         <div class="section-header-bar">
           <div class="sh-title-group">
             <h3 class="sh-title">SCENARIO CATALOG</h3>
-            <span class="sh-subtitle">Calibrated thermodynamic scenarios for thermal profiling and model validation</span>
+            <span class="sh-subtitle">Calibrated thermodynamic scenarios for thermal profiling and validation</span>
           </div>
         </div>
 
         <div class="sim-scenarios-grid">
           ${scenarios.map(s => {
-      const isAct = s.id === activeId;
-      return `
+            const isAct = s.id === activeId;
+            return `
               <div class="sim-scenario-card ${isAct ? 'card-active' : ''}" data-scenario-id="${s.id}">
                 <div class="sc-header">
-                  <span class="sc-id">SCENARIO 0${s.id}</span>
-                  ${isAct ? '<span class="sc-status-tag">ACTIVE</span>' : ''}
+                  <span class="sc-id">${s.code}</span>
+                  ${isAct ? '<span class="sc-status-tag sc-status-active">ACTIVE SCENARIO</span>' : ''}
                 </div>
-                <h4 class="sc-title">${s.title.replace(`SCENARIO 0${s.id} — `, '').replace(`SCENARIO ${s.id}: `, '')}</h4>
+                <h4 class="sc-title">${s.title}</h4>
                 <p class="sc-desc">${s.desc}</p>
                 <div class="sc-spec-list">
-                  <div class="spec-item"><span class="spec-k">Primary source:</span> <span class="spec-v">${s.source}</span></div>
-                  <div class="spec-item"><span class="spec-k">Expected effect:</span> <span class="spec-v">${s.result}</span></div>
+                  <div class="spec-item"><span class="spec-k">PRIMARY SOURCE:</span> <span class="spec-v">${s.source}</span></div>
+                  <div class="spec-item"><span class="spec-k">EXPECTED RESPONSE:</span> <span class="spec-v">${s.result}</span></div>
                 </div>
                 <button class="btn-eng ${isAct ? 'btn-eng-primary' : 'btn-eng-subtle'} btn-select-scen" data-select-id="${s.id}">
-                  ${isAct ? 'Active' : 'Load'}
+                  ${isAct ? 'Active' : 'Load Scenario'}
                 </button>
               </div>
             `;
-    }).join('')}
+          }).join('')}
         </div>
       </div>
     `;
 
-    // 7. Scenario Comparison Modal
+    // 11. Collapsible Computer Workstations Telemetry Drawer
+    const computerTelemetrySection = `
+      <details class="sim-collapsible-nodes">
+        <summary class="sim-nodes-summary">
+          <span class="nodes-summary-title">WORKSTATION TELEMETRY</span>
+          <span class="nodes-summary-sub">10 Cluster Nodes • Workloads, CPU, GPU & Heat Output (Click to Expand)</span>
+        </summary>
+        <div class="sim-nodes-content">
+          <!-- Compact Summary Strip -->
+          <div class="sim-comp-summary-strip">
+            <div class="summary-metric"><span class="sm-lbl">TOTAL NODES</span><span class="sm-val" id="sim-sum-total">10 / 10</span></div>
+            <div class="summary-metric"><span class="sm-lbl">HEAVY LOAD</span><span class="sm-val" id="sim-sum-heavy">0</span></div>
+            <div class="summary-metric"><span class="sm-lbl">ACTIVE NODES</span><span class="sm-val" id="sim-sum-active">10</span></div>
+            <div class="summary-metric"><span class="sm-lbl">TOTAL COMPUTE HEAT</span><span class="sm-val" id="sim-sum-heat">850.0 W</span></div>
+            <div class="summary-metric"><span class="sm-lbl">AVERAGE CPU</span><span class="sm-val" id="sim-sum-avg-cpu">20.0%</span></div>
+            <div class="summary-metric"><span class="sm-lbl">AVERAGE GPU</span><span class="sm-val" id="sim-sum-avg-gpu">10.0%</span></div>
+          </div>
+
+          <!-- Selected Node Inspector -->
+          <div class="sim-selected-inspector" id="sim-selected-inspector" style="display: none;">
+            <div class="si-left">
+              <span class="si-tag">SELECTED NODE:</span>
+              <strong class="si-name" id="sim-insp-name">Computer 1</strong>
+              <span class="si-zone" id="sim-insp-zone">Zone 1 (NW)</span>
+            </div>
+            <div class="si-metrics">
+              <div class="si-metric"><span class="si-lbl">CPU:</span> <strong id="sim-insp-cpu">20.0%</strong> <span class="trend-icon" id="sim-insp-cputrend">→</span></div>
+              <div class="si-metric"><span class="si-lbl">GPU:</span> <strong id="sim-insp-gpu">10.0%</strong></div>
+              <div class="si-metric"><span class="si-lbl">WORKLOAD:</span> <span class="status-tag" id="sim-insp-cat">LIGHT</span></div>
+              <div class="si-metric"><span class="si-lbl">HEAT:</span> <strong id="sim-insp-heat">86.7 W</strong> <span class="trend-tag" id="sim-insp-heattrend">STABLE</span></div>
+              <div class="si-metric"><span class="si-lbl">CONTRIBUTION:</span> <span class="contrib-tag" id="sim-insp-contrib">LOW</span></div>
+              <div class="si-metric"><span class="si-lbl">STATUS:</span> <span class="status-tag" id="sim-insp-status">RUNNING</span></div>
+            </div>
+            <button class="btn-eng btn-eng-subtle btn-xs" id="btn-deselect-node">Deselect</button>
+          </div>
+
+          <!-- Telemetry Table -->
+          <div class="sim-table-wrapper">
+            <table class="sim-nodes-table" id="sim-nodes-table">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">ID</th>
+                  <th style="width: 110px;">ZONE</th>
+                  <th style="width: 140px;">CPU</th>
+                  <th style="width: 120px;">WORKLOAD</th>
+                  <th style="width: 130px;">GPU</th>
+                  <th style="width: 140px; text-align: right;">HEAT</th>
+                  <th style="width: 140px;">THERMAL LOAD</th>
+                  <th style="width: 110px;">STATUS</th>
+                  <th style="width: 80px; text-align: center;">ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="sim-nodes-tbody">
+                ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(id => {
+                  const zoneName = id <= 4 ? 'Z1 NW' : (id <= 6 ? 'Z2 NE' : (id <= 8 ? 'Z3 SE' : 'Z4 SW'));
+                  return `
+                    <tr class="sim-node-row" id="sim-row-c${id}" data-comp-id="${id}">
+                      <td class="cell-node-id"><strong>C${id}</strong></td>
+                      <td class="cell-zone" id="sim-row-zone-${id}">${zoneName}</td>
+                      <td class="cell-cpu">
+                        <div class="val-bar-group">
+                          <span class="cell-num-fixed" id="sim-row-cpu-${id}">20.0%</span>
+                          <span class="trend-icon" id="sim-row-cputrend-${id}">→</span>
+                          <div class="eng-inline-bar"><div class="bar-fill" id="sim-row-cpubar-${id}" style="width: 20%;"></div></div>
+                        </div>
+                      </td>
+                      <td class="cell-workload">
+                        <span class="status-tag status-light" id="sim-row-cat-${id}">LIGHT</span>
+                      </td>
+                      <td class="cell-gpu">
+                        <div class="val-bar-group">
+                          <span class="cell-num-fixed" id="sim-row-gpu-${id}">10.0%</span>
+                          <div class="eng-inline-bar"><div class="bar-fill" id="sim-row-gpubar-${id}" style="width: 10%;"></div></div>
+                        </div>
+                      </td>
+                      <td class="cell-heat" style="text-align: right;">
+                        <span class="cell-num-fixed" id="sim-row-heat-${id}">86.7 W</span>
+                        <span class="trend-tag trend-stable" id="sim-row-heattrend-${id}">STABLE</span>
+                      </td>
+                      <td class="cell-contrib">
+                        <span class="contrib-tag contrib-low" id="sim-row-contrib-${id}">LOW</span>
+                      </td>
+                      <td class="cell-status">
+                        <span class="status-tag status-running" id="sim-row-status-${id}">RUNNING</span>
+                      </td>
+                      <td class="cell-action" style="text-align: center;">
+                        <button class="btn-eng btn-eng-subtle btn-xs btn-inspect-node" data-comp-id="${id}">Select</button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    `;
+
+    // 12. Scenario Comparison Matrix Modal
     const comparisonDrawer = `
       <div class="sim-comparison-modal" id="sim-comparison-modal" style="display: none;">
         <div class="modal-overlay" id="sim-modal-overlay"></div>
@@ -935,8 +1136,8 @@
                 <thead>
                   <tr>
                     <th>Scenario</th>
-                    <th>Dominant Heat Source</th>
-                    <th style="text-align: right;">Initial Temp</th>
+                    <th>Name</th>
+                    <th>Type</th>
                     <th style="text-align: right;">Final Temp</th>
                     <th style="text-align: right;">Peak Temp</th>
                     <th style="text-align: right;">Min Temp</th>
@@ -954,192 +1155,23 @@
       </div>
     `;
 
-    // 8. HVEAC BRAIN — CLOSED-LOOP & SHADOW CONTROL PANEL
-    const ctrlMode = s.simulation?.controlMode || 'BASELINE';
-    const brainShadowSection = `
-      <div class="sim-brain-shadow-section" id="sim-brain-shadow-section">
-        <!-- Control Mode Selector Bar (Section 3, 4, 19) -->
-        <div class="sim-ctrl-mode-selector">
-          <span class="ctrl-mode-label">SIMULATION CONTROL MODE</span>
-          <div class="ctrl-mode-buttons">
-            <button class="btn-ctrl-mode ${ctrlMode === 'BASELINE' ? 'active' : ''}" data-mode="BASELINE" id="btn-mode-baseline">BASELINE</button>
-            <button class="btn-ctrl-mode ${ctrlMode === 'SHADOW' ? 'active' : ''}" data-mode="SHADOW" id="btn-mode-shadow">SHADOW</button>
-            <button class="btn-ctrl-mode disabled" data-mode="AI_CONTROL" id="btn-mode-ai" disabled title="AI_CONTROL is temporarily DISABLED pending thermal control audit" style="opacity: 0.55; cursor: not-allowed; border-color: rgba(239, 68, 68, 0.4); color: #f87171;">AI CONTROL [DISABLED - AUDIT]</button>
-          </div>
-        </div>
-
-        <!-- Thermal Control Audit Notice Banner -->
-        <div class="ai-control-audit-banner" style="background: rgba(220, 38, 38, 0.12); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 4px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #fca5a5;">
-          <span><strong style="color: #f87171;">CRITICAL THERMAL CONTROL AUDIT IN PROGRESS:</strong> AI Closed-Loop Control is temporarily DISABLED pending physical control semantics verification. BASELINE and SHADOW modes remain active.</span>
-          <span style="font-family: monospace; font-size: 10px; background: rgba(239,68,68,0.25); color: #fecaca; padding: 2px 6px; border-radius: 2px;">AUDIT ACTIVE</span>
-        </div>
-
-        <!-- AI Control Simulation Notice Banner (Section 4) -->
-        <div class="ai-control-banner" id="ai-control-banner" style="display: ${ctrlMode === 'AI_CONTROL' ? 'flex' : 'none'};">
-          <span class="banner-badge">AI CONTROL — SIMULATION ONLY</span>
-          <span class="banner-note">HVEAC Brain v1 controls simulated room target through Safety Governor. Real hardware connection = STRICTLY DISABLED.</span>
-        </div>
-
-        <!-- Section Header Bar -->
-        <div class="section-header-bar">
-          <div class="sh-title-group">
-            <h3 class="sh-title">HVEAC BRAIN — CLOSED-LOOP & SHADOW CONTROL PANEL</h3>
-            <span class="sh-subtitle">Simulation-only setpoint optimization through Safety Governor</span>
-          </div>
-          <div class="sh-badge-group">
-            <span class="brain-mode-badge" id="brain-active-badge">MODE: BASELINE</span>
-            <span class="brain-status-badge" id="brain-status-badge">READY</span>
-            <span class="brain-path-badge" id="brain-path-badge">CONTROL: SIMULATOR ONLY</span>
-            <span class="brain-latency-badge" id="brain-latency-badge">LATENCY: <span class="lat-val" id="brain-latency-val">—</span></span>
-          </div>
-        </div>
-
-        <!-- Model Authority & Invariants Strip -->
-        <div class="brain-info-strip" id="brain-info-strip">
-          <div class="brain-info-item">
-            <span class="bi-lbl">CONTROL AUTHORITY:</span>
-            <span class="bi-val highlight-val" id="ctrl-authority">SIMULATOR OPTIMIZER</span>
-          </div>
-          <div class="brain-info-item">
-            <span class="bi-lbl">SAFETY GOVERNOR:</span>
-            <span class="bi-val" id="ctrl-safety-status">ACTIVE</span>
-          </div>
-          <div class="brain-info-item">
-            <span class="bi-lbl">MODEL:</span>
-            <span class="bi-val" id="brain-model-ver">hveac_brain_v1</span>
-          </div>
-          <div class="brain-info-item">
-            <span class="bi-lbl">INPUT FEATURES:</span>
-            <span class="bi-val" id="brain-feature-count">80</span>
-          </div>
-          <div class="brain-info-item">
-            <span class="bi-lbl">VALID DOMAIN:</span>
-            <span class="bi-val">24.5°C – 26.5°C</span>
-          </div>
-        </div>
-
-        <!-- 4-Card Setpoint Architecture (Sections 19, 20, 26) -->
-        <div class="brain-comparison-grid brain-4grid">
-          <div class="brain-compare-card">
-            <div class="bcc-header">
-              <span class="bcc-tag bcc-tag-ai">AI REQUEST</span>
-              <span class="bcc-confidence" id="brain-confidence">— %</span>
-            </div>
-            <div class="bcc-value" id="ctrl-ai-requested">—</div>
-            <div class="bcc-sub">Brain raw predicted setpoint</div>
-          </div>
-          <div class="brain-compare-card">
-            <div class="bcc-header">
-              <span class="bcc-tag bcc-tag-gov">SAFETY GOVERNOR</span>
-              <span class="bcc-action" id="ctrl-safety-status-tag">PASSED</span>
-            </div>
-            <div class="bcc-value" id="ctrl-ai-safe">—</div>
-            <div class="bcc-sub" id="ctrl-safety-reason">Rate & Dwell checked</div>
-          </div>
-          <div class="brain-compare-card brain-applied-card">
-            <div class="bcc-header">
-              <span class="bcc-tag bcc-tag-applied">APPLIED SETPOINT</span>
-              <span class="bcc-action" id="ctrl-applied-mode">BASELINE</span>
-            </div>
-            <div class="bcc-value" id="ctrl-ai-applied">—</div>
-            <div class="bcc-sub">Active setpoint in simulator</div>
-          </div>
-          <div class="brain-compare-card brain-agreement-card">
-            <div class="bcc-header">
-              <span class="bcc-tag bcc-tag-sim">BASELINE REFERENCE</span>
-              <span class="bcc-agreement" id="brain-agreement">—</span>
-            </div>
-            <div class="bcc-value" id="ctrl-baseline-sp">—</div>
-            <div class="bcc-deviation" id="ctrl-delta-val">Delta: 0.0 °C</div>
-          </div>
-        </div>
-
-        <!-- Live Performance Comparison Area (Sections 21, 22, 36) -->
-        <div class="brain-perf-comparison">
-          <div class="card-title-eng">HVEAC BRAIN vs SIMULATOR OPTIMIZER — PERFORMANCE METRICS (SIMULATED RESULT)</div>
-          <div class="perf-metrics-grid">
-            <div class="pm-box">
-              <div class="pm-label">TOTAL COOLING ENERGY</div>
-              <div class="pm-vals">
-                <span class="pm-base" id="comp-base-energy">7.00 kWh</span> vs 
-                <span class="pm-ai" id="comp-ai-energy">6.24 kWh</span>
-              </div>
-              <div class="pm-delta" id="comp-energy-delta">-10.8% Simulated Result</div>
-            </div>
-            <div class="pm-box">
-              <div class="pm-label">COMFORT BAND (21-24°C)</div>
-              <div class="pm-vals">
-                <span class="pm-base" id="comp-base-comfort">100.0%</span> vs 
-                <span class="pm-ai" id="comp-ai-comfort">12.9%</span>
-              </div>
-              <div class="pm-delta" id="comp-comfort-delta">Standard Band Compliance</div>
-            </div>
-            <div class="pm-box">
-              <div class="pm-label">SETPOINT CHANGES</div>
-              <div class="pm-vals">
-                <span class="pm-base" id="comp-base-changes">0</span> vs 
-                <span class="pm-ai" id="comp-ai-changes">8</span>
-              </div>
-              <div class="pm-sub">Dwell ≥ 60s Enforced</div>
-            </div>
-            <div class="pm-box">
-              <div class="pm-label">SAFETY INTERVENTIONS</div>
-              <div class="pm-vals" id="comp-interventions">
-                Rate: 8 | Dwell: 35 | Fallback: 0
-              </div>
-              <div class="pm-sub">100% Commands Validated</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Recent Control Decision Event Log (Section 27) -->
-        <div class="brain-event-log-section">
-          <div class="card-title-eng">RECENT CONTROL DECISION LOG (SIMULATION ONLY)</div>
-          <div class="compact-event-log" id="ctrl-events-log">
-            <div class="event-row-empty">No control interventions recorded yet.</div>
-          </div>
-        </div>
-
-        <!-- Class Probability Distribution -->
-        <div class="brain-proba-section">
-          <div class="card-title-eng">CLASS PROBABILITY DISTRIBUTION</div>
-          <div class="brain-proba-bars" id="brain-proba-bars">
-            <div class="proba-placeholder">Waiting for prediction…</div>
-          </div>
-        </div>
-
-        <!-- Shadow Trend History -->
-        <div class="brain-trend-section">
-          <div class="card-title-eng">AI vs SIMULATOR — SETPOINT TREND</div>
-          <div class="sim-canvas-wrapper">
-            <canvas id="brain-trend-canvas" width="520" height="160"></canvas>
-          </div>
-        </div>
-
-        <!-- Model Inputs Inspector (collapsible) -->
-        <details class="brain-inputs-inspector">
-          <summary class="card-title-eng clickable-summary">MODEL INPUTS INSPECTOR (80 FEATURES) ▸</summary>
-          <div class="brain-inputs-grid" id="brain-inputs-grid">
-            <div class="proba-placeholder">Run a prediction to inspect model inputs</div>
-          </div>
-          <div class="brain-input-warnings" id="brain-input-warnings"></div>
-        </details>
-      </div>
-    `;
-
+    // Assemble final clean coherent page structure matching Section 35
     const fullContent = `
       ${header}
-      ${toolbar}
+      ${controlModeBar}
+      ${statusStrip}
+      ${kpiRow}
       <div class="sim-main-stage ${isPitch ? 'stage-pitch' : ''}">
         ${roomViewport}
         ${monitorPanel}
       </div>
-      ${computerTelemetrySection}
-      ${brainShadowSection}
+      ${zoneTelemetrySection}
+      ${acTelemetrySection}
+      ${pipelineSection}
       ${scenarioCards}
+      ${computerTelemetrySection}
       ${comparisonDrawer}
     `;
-
 
     return PageShell({
       content: fullContent,
@@ -1147,10 +1179,10 @@
     });
   }
 
-  /**
-   * Targeted DOM updater for live simulation ticks.
-   * Updates only dynamic text, progress bar, workstations, and canvas heatmap without re-rendering page shell.
-   */
+  // --------------------------------------------------------------------------
+  // Targeted DOM Telemetry Updates (WebSocket 10 Hz)
+  // --------------------------------------------------------------------------
+
   function updateSimulationDom(data) {
     if (!data) return;
 
@@ -1202,7 +1234,7 @@
     const elGrad = document.getElementById('sim-kpi-gradient');
     if (elGrad) elGrad.textContent = `${(thermal.temperature_difference_c ?? 0.0).toFixed(1)} °C`;
 
-    // Zone tags on top-down room
+    // Zone tags on top-down CAD floorplan
     const tag1 = document.getElementById('sim-tag-z1');
     if (tag1) tag1.textContent = `${(zoneTemps.zone_1 ?? 22.5).toFixed(1)} °C`;
     const tag2 = document.getElementById('sim-tag-z2');
@@ -1212,8 +1244,9 @@
     const tag4 = document.getElementById('sim-tag-z4');
     if (tag4) tag4.textContent = `${(zoneTemps.zone_4 ?? 22.5).toFixed(1)} °C`;
 
-    // Zone occupancy tags on map
-    const occZones = data.occupancy?.zones || {};
+    // Occupancy counts on zone overlays
+    const occ = data.occupancy || {};
+    const occZones = occ.zones || {};
     const occ1 = document.getElementById('sim-occ-z1');
     if (occ1) occ1.textContent = `${occZones.zone_1 ?? 0} OCC`;
     const occ2 = document.getElementById('sim-occ-z2');
@@ -1223,7 +1256,7 @@
     const occ4 = document.getElementById('sim-occ-z4');
     if (occ4) occ4.textContent = `${occZones.zone_4 ?? 0} OCC`;
 
-    // Zone telemetry table cells (Section 10)
+    // Zone summary table cells
     const zmT1 = document.getElementById('sim-zm-t1');
     if (zmT1) zmT1.textContent = `${(zoneTemps.zone_1 ?? 22.5).toFixed(1)} °C`;
     const zmT2 = document.getElementById('sim-zm-t2');
@@ -1262,7 +1295,7 @@
     const elZtO4 = document.getElementById('sim-zt-occ4');
     if (elZtO4) elZtO4.textContent = `${occZones.zone_4 ?? 0}`;
 
-    // 4. AC Units on walls
+    // 4. Perimeter AC Units on walls
     const acs = data.hvac?.acs || [];
     acs.forEach(ac => {
       const elVal = document.getElementById(`sim-ac-${ac.wall}-val`);
@@ -1271,9 +1304,8 @@
       }
     });
 
-    // 5. Workstations markers & Computer Telemetry Table (Section 14 & 15)
+    // 5. Workstations markers & Computer Telemetry Table
     computers.forEach(c => {
-      // Map marker load bar & aura
       const fill = document.getElementById(`sim-load-${c.id}`);
       if (fill) fill.style.width = `${Math.min(Math.max(c.cpu_util_percent, 0), 100)}%`;
 
@@ -1288,7 +1320,6 @@
         }
       }
 
-      // Telemetry table row cells
       const elCpu = document.getElementById(`sim-row-cpu-${c.id}`);
       if (elCpu) elCpu.textContent = `${c.cpu_util_percent.toFixed(1)}%`;
 
@@ -1417,388 +1448,89 @@
       bNet.style.color = net > 200 ? '#f85149' : net < -200 ? '#58a6ff' : '#e6edf3';
     }
 
-    // 7. Control Recommendation (Rule-based simulation baseline)
-    const targets = data.targets || {};
-    const tAction = document.getElementById('sim-target-action');
-    if (tAction) tAction.textContent = targets.optimal_hvac_action || 'ECO_MAINTAIN';
-    const tTemp = document.getElementById('sim-target-temp');
-    if (tTemp) tTemp.textContent = `${(targets.optimal_temperature_c ?? 22.5).toFixed(1)} °C`;
-    const tAcs = document.getElementById('sim-target-acs');
-    if (tAcs) {
-      const ac1 = Math.round((targets.optimal_cooling_ac1 ?? 0) * 100);
-      const ac2 = Math.round((targets.optimal_cooling_ac2 ?? 0) * 100);
-      const ac3 = Math.round((targets.optimal_cooling_ac3 ?? 0) * 100);
-      const ac4 = Math.round((targets.optimal_cooling_ac4 ?? 0) * 100);
-      tAcs.textContent = `AC1: ${ac1}% | AC2: ${ac2}% | AC3: ${ac3}% | AC4: ${ac4}%`;
-    }
-
-    // 8. Render Canvas Heatmap
+    // 7. Render Canvas Heatmap
     const canvasHeat = document.getElementById('sim-heatmap-canvas');
     if (canvasHeat && window.HVEAC_SIM_VISUALS) {
       window.HVEAC_SIM_VISUALS.renderThermalHeatmap(canvasHeat, data);
     }
-  }
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // HVEAC BRAIN — SHADOW MODE DOM UPDATER
-  // ══════════════════════════════════════════════════════════════════════════
-
-  // Trend history buffer for the AI vs Simulator chart
-  const _brainTrendHistory = [];
-  const _brainTrendMaxPoints = 60;
-
-  /**
-   * Updates the Brain Shadow Mode section from the /api/brain/shadow-predict response.
-   * Called periodically (~every 2s) when the simulation is running.
-   */
-  function updateBrainShadowDom(brainData, simMsg) {
-    if (!brainData && !simMsg) return;
-
-    const section = document.getElementById('sim-brain-shadow-section');
-    if (!section) return;
-
-    // 0. Control Mode Buttons & Active Banner (Section 3, 4, 19)
-    const curMode = (simMsg && simMsg.control_mode) || 'BASELINE';
-    document.querySelectorAll('.btn-ctrl-mode').forEach(b => {
-      b.classList.toggle('active', b.getAttribute('data-mode') === curMode);
-    });
-
-    const banner = document.getElementById('ai-control-banner');
-    if (banner) {
-      banner.style.display = curMode === 'AI_CONTROL' ? 'flex' : 'none';
-    }
-
-    const modeBadge = document.getElementById('brain-active-badge');
-    if (modeBadge) {
-      modeBadge.textContent = `MODE: ${curMode}`;
-      modeBadge.style.color = curMode === 'AI_CONTROL' ? '#3fb950' : (curMode === 'SHADOW' ? '#d29922' : '#8b949e');
-    }
-
-    const pathBadge = document.getElementById('brain-path-badge');
-    if (pathBadge && simMsg && simMsg.control_path) {
-      pathBadge.textContent = `CONTROL: ${simMsg.control_path}`;
-    }
-
-    // 1. Model status & authority
-    const statusBadge = document.getElementById('brain-status-badge');
-    if (statusBadge) {
-      const st = (simMsg && simMsg.model_status) || (brainData && brainData.status) || 'READY';
-      statusBadge.textContent = st;
-      statusBadge.className = `brain-status-badge brain-st-${st.toLowerCase()}`;
-    }
-
-    const authEl = document.getElementById('ctrl-authority');
-    if (authEl) {
-      authEl.textContent = (simMsg && simMsg.control_authority) || (curMode === 'AI_CONTROL' ? 'HVEAC BRAIN v1' : 'SIMULATOR OPTIMIZER');
-      authEl.style.color = curMode === 'AI_CONTROL' ? '#58a6ff' : '#d29922';
-    }
-
-    const govStatusEl = document.getElementById('ctrl-safety-status');
-    if (govStatusEl && simMsg && simMsg.safety_status) {
-      govStatusEl.textContent = simMsg.safety_status;
-    }
-
-    // 2. Setpoint Cards (Track separately: AI Requested, Safety Governor, Applied, Baseline)
-    const pred = (brainData && brainData.prediction) || {};
-    const sim = (brainData && brainData.simulator) || {};
-    const comp = (brainData && brainData.comparison) || {};
-
-    const reqVal = (simMsg && simMsg.ai_requested_setpoint_c != null)
-      ? simMsg.ai_requested_setpoint_c
-      : pred.ai_setpoint_c;
-    const reqEl = document.getElementById('ctrl-ai-requested');
-    if (reqEl) reqEl.textContent = reqVal != null ? `${reqVal.toFixed(1)} °C` : '—';
-
-    const safeVal = (simMsg && simMsg.ai_safe_setpoint_c != null)
-      ? simMsg.ai_safe_setpoint_c
-      : reqVal;
-    const safeEl = document.getElementById('ctrl-ai-safe');
-    if (safeEl) safeEl.textContent = safeVal != null ? `${safeVal.toFixed(1)} °C` : '—';
-
-    const safeTagEl = document.getElementById('ctrl-safety-status-tag');
-    if (safeTagEl && simMsg && simMsg.safety_status) {
-      safeTagEl.textContent = simMsg.safety_status;
-    }
-
-    const safeReasonEl = document.getElementById('ctrl-safety-reason');
-    if (safeReasonEl && simMsg && simMsg.safety_reason) {
-      safeReasonEl.textContent = simMsg.safety_reason;
-    }
-
-    const appliedVal = (simMsg && simMsg.ai_applied_setpoint_c != null)
-      ? simMsg.ai_applied_setpoint_c
-      : (curMode === 'AI_CONTROL' ? safeVal : (sim.setpoint_c != null ? sim.setpoint_c : 22.5));
-    const appliedEl = document.getElementById('ctrl-ai-applied');
-    if (appliedEl) appliedEl.textContent = appliedVal != null ? `${appliedVal.toFixed(1)} °C` : '—';
-
-    const appliedModeEl = document.getElementById('ctrl-applied-mode');
-    if (appliedModeEl) {
-      appliedModeEl.textContent = curMode === 'AI_CONTROL' ? 'AI (SAFE)' : 'BASELINE';
-    }
-
-    const baseVal = (simMsg && simMsg.baseline_setpoint_c != null)
-      ? simMsg.baseline_setpoint_c
-      : (sim.setpoint_c != null ? sim.setpoint_c : 22.5);
-    const baseEl = document.getElementById('ctrl-baseline-sp');
-    if (baseEl) baseEl.textContent = baseVal != null ? `${baseVal.toFixed(1)} °C` : '—';
-
-    const deltaVal = (simMsg && simMsg.setpoint_difference_c != null)
-      ? simMsg.setpoint_difference_c
-      : (appliedVal != null && baseVal != null ? (appliedVal - baseVal) : 0.0);
-    const deltaEl = document.getElementById('ctrl-delta-val');
-    if (deltaEl) {
-      deltaEl.textContent = `Δ ${deltaVal > 0 ? '+' : ''}${deltaVal.toFixed(1)} °C`;
-    }
-
-    const confEl = document.getElementById('brain-confidence');
-    if (confEl) {
-      confEl.textContent = pred.confidence != null
-        ? `${(pred.confidence * 100).toFixed(1)}%`
-        : '— %';
-    }
-
-    const agreeEl = document.getElementById('brain-agreement');
-    if (agreeEl) {
-      const isAgree = Math.abs(deltaVal) < 0.25;
-      agreeEl.textContent = isAgree ? '✓ AGREE' : '≠ DELTA';
-      agreeEl.className = isAgree ? 'bcc-agreement agree-yes' : 'bcc-agreement agree-no';
-    }
-
-    // 3. Live Performance Comparison (Section 21)
-    if (simMsg && simMsg.ai_control && simMsg.ai_control.metrics) {
-      const m = simMsg.ai_control.metrics;
-      if (m.baseline && m.ai_control) {
-        const bEnergy = document.getElementById('comp-base-energy');
-        if (bEnergy) bEnergy.textContent = `${m.baseline.total_cooling_energy_kwh.toFixed(2)} kWh`;
-        const aEnergy = document.getElementById('comp-ai-energy');
-        if (aEnergy) aEnergy.textContent = `${m.ai_control.total_cooling_energy_kwh.toFixed(2)} kWh`;
-
-        const dEnergy = document.getElementById('comp-energy-delta');
-        if (dEnergy && m.comparison) {
-          const pct = m.comparison.energy_delta_pct;
-          dEnergy.textContent = `${pct > 0 ? '+' : ''}${pct.toFixed(1)}% Simulated Result`;
-          dEnergy.style.color = pct <= 0 ? '#3fb950' : '#f85149';
-        }
-
-        const bComfort = document.getElementById('comp-base-comfort');
-        if (bComfort) bComfort.textContent = `${m.baseline.comfort_band_pct.toFixed(1)}%`;
-        const aComfort = document.getElementById('comp-ai-comfort');
-        if (aComfort) aComfort.textContent = `${m.ai_control.comfort_band_pct.toFixed(1)}%`;
-
-        const bChanges = document.getElementById('comp-base-changes');
-        if (bChanges) bChanges.textContent = `${m.baseline.setpoint_changes ?? 0}`;
-        const aChanges = document.getElementById('comp-ai-changes');
-        if (aChanges) aChanges.textContent = `${m.ai_control.setpoint_changes ?? 0}`;
-
-        const interEl = document.getElementById('comp-interventions');
-        if (interEl && m.governor) {
-          interEl.textContent = `Rate: ${m.governor.rate_limit_count} | Dwell: ${m.governor.dwell_hold_count} | Fallback: ${m.governor.fallback_count}`;
-        }
+    // 8. Thermal Control Algorithm Telemetry & Dynamic Pipeline Data
+    const ctrl = data.control || {};
+    if (ctrl) {
+      // Room-level summary (Section 11)
+      const ctrlRoomTemp = document.getElementById('ctrl-room-temp');
+      if (ctrlRoomTemp) ctrlRoomTemp.textContent = `${(ctrl.room_temperature_c ?? 22.5).toFixed(1)}°C`;
+      const ctrlRoomDemand = document.getElementById('ctrl-room-demand');
+      if (ctrlRoomDemand) ctrlRoomDemand.textContent = `${(ctrl.room_cooling_demand ?? 0).toFixed(0)}%`;
+      const ctrlRoomSp = document.getElementById('ctrl-room-setpoint');
+      if (ctrlRoomSp) ctrlRoomSp.textContent = `${(ctrl.room_setpoint_c ?? 24.0).toFixed(1)}°C`;
+      const ctrlFallback = document.getElementById('ctrl-fallback-status');
+      if (ctrlFallback) {
+        ctrlFallback.textContent = ctrl.is_fallback ? 'FALLBACK ACTIVATED' : 'NORMAL • SINGLE DECISION-MAKER';
+        ctrlFallback.style.color = ctrl.is_fallback ? '#f85149' : '#3fb950';
       }
-    }
 
-    // 4. Compact Control Decision Event Log (Section 27)
-    if (simMsg && simMsg.ai_control && simMsg.ai_control.recent_events) {
-      const events = simMsg.ai_control.recent_events;
-      const logContainer = document.getElementById('ctrl-events-log');
-      if (logContainer && events.length > 0) {
-        logContainer.innerHTML = events.slice(-8).map(e => `
-          <div class="log-entry">
-            <span class="log-time">${e.time || '00:00:00'}</span>
-            <span class="log-req">AI REQ: ${e.ai_requested_c != null ? e.ai_requested_c.toFixed(1) : '—'}°C</span>
-            <span class="log-app">APPLIED: ${e.applied_c != null ? e.applied_c.toFixed(1) : '—'}°C</span>
-            <span class="log-st st-${(e.status || 'applied').toLowerCase()}">${e.status || 'APPLIED'}</span>
-            <span class="log-rs">${e.reason || ''}</span>
-          </div>
-        `).join('');
-      }
-    }
-
-    // 3. Class Probability Distribution bars
-    const probaContainer = document.getElementById('brain-proba-bars');
-    if (probaContainer && pred.class_probabilities) {
-      const probs = pred.class_probabilities;
-      const classes = Object.keys(probs).sort((a, b) => parseFloat(a) - parseFloat(b));
-      const maxP = Math.max(...Object.values(probs), 0.01);
-
-      let html = '';
-      classes.forEach(cls => {
-        const p = probs[cls];
-        const pct = (p * 100).toFixed(1);
-        const barW = Math.max(2, (p / maxP) * 100);
-        const isPred = pred.ai_setpoint_c != null && parseFloat(cls) === pred.ai_setpoint_c;
-        html += `
-          <div class="proba-bar-row ${isPred ? 'proba-predicted' : ''}">
-            <span class="proba-label">${cls} °C</span>
-            <div class="proba-bar-track">
-              <div class="proba-bar-fill" style="width: ${barW}%;"></div>
-            </div>
-            <span class="proba-pct">${pct}%</span>
-          </div>
-        `;
+      // Zone-level control telemetry (Section 13)
+      const zones = ctrl.zones || {};
+      ['zone_1', 'zone_2', 'zone_3', 'zone_4'].forEach((zk, i) => {
+        const n = i + 1;
+        const z = zones[zk] || {};
+        const elTmp = document.getElementById(`ctrl-z${n}-temp`);
+        if (elTmp) elTmp.textContent = `${(z.temperature_c ?? 22.5).toFixed(1)}°C`;
+        const elHt = document.getElementById(`ctrl-z${n}-heat`);
+        if (elHt) elHt.textContent = `${Math.round(z.heat_load_w ?? 0)} W`;
+        const elDm = document.getElementById(`ctrl-z${n}-demand`);
+        if (elDm) {
+          const d = z.cooling_demand ?? 0;
+          elDm.textContent = `${d.toFixed(0)}%`;
+          elDm.style.color = d > 50 ? '#f85149' : d > 20 ? '#d29922' : '#3fb950';
+        }
+        const elTr = document.getElementById(`ctrl-z${n}-trend`);
+        if (elTr) {
+          const tv = z.trend_c_per_min ?? 0;
+          elTr.textContent = `${tv >= 0 ? '+' : ''}${tv.toFixed(2)}°C/min`;
+          elTr.style.color = tv > 0.05 ? '#f85149' : tv < -0.05 ? '#58a6ff' : '#8b949e';
+        }
       });
-      probaContainer.innerHTML = html;
-    }
 
-    // 4. Trend history chart (record once per simulation step)
-    if (pred.ai_setpoint_c != null && sim.setpoint_c != null) {
-      const ctx = brainData.simulation_context || {};
-      const curStep = ctx.step_index != null ? ctx.step_index : Math.floor((ctx.simulation_time_seconds || 0) / 10);
-      const lastPoint = _brainTrendHistory[_brainTrendHistory.length - 1];
-      if (!lastPoint || lastPoint.step !== curStep) {
-        _brainTrendHistory.push({
-          time: ctx.simulation_time_seconds || 0,
-          step: curStep,
-          ai: pred.ai_setpoint_c,
-          sim: sim.setpoint_c,
-        });
-        if (_brainTrendHistory.length > _brainTrendMaxPoints) {
-          _brainTrendHistory.splice(0, _brainTrendHistory.length - _brainTrendMaxPoints);
+      // AC-level control output (Section 14)
+      const ctrlAcs = ctrl.acs || {};
+      ['ac1', 'ac2', 'ac3', 'ac4'].forEach(ak => {
+        const a = ctrlAcs[ak] || {};
+        const elCl = document.getElementById(`ctrl-${ak}-cooling`);
+        if (elCl) {
+          const cv = a.cooling_percent ?? 0;
+          elCl.textContent = `${cv.toFixed(0)}%`;
+          elCl.style.color = cv > 50 ? '#f85149' : cv > 20 ? '#d29922' : '#3fb950';
         }
-        _renderBrainTrendChart();
+        const elSp = document.getElementById(`ctrl-${ak}-sp`);
+        if (elSp) elSp.textContent = `${(a.setpoint_c ?? 24.0).toFixed(1)}°C`;
+      });
+
+      // Live Decision Summary (Section 18)
+      const elCurDec = document.getElementById('ctrl-current-decision');
+      if (elCurDec && ctrl.acs) {
+        const rT = (ctrl.room_temperature_c ?? 22.5).toFixed(1);
+        const rD = Math.round(ctrl.room_cooling_demand ?? 0);
+        const a1 = Math.round(ctrl.acs.ac1?.cooling_percent ?? 0);
+        const a2 = Math.round(ctrl.acs.ac2?.cooling_percent ?? 0);
+        const a3 = Math.round(ctrl.acs.ac3?.cooling_percent ?? 0);
+        const a4 = Math.round(ctrl.acs.ac4?.cooling_percent ?? 0);
+        elCurDec.textContent = `Room: ${rT}°C  |  Average demand: ${rD}%  |  AC1: ${a1}%  |  AC2: ${a2}%  |  AC3: ${a3}%  |  AC4: ${a4}%`;
       }
     }
 
-    // 5. Diagnostics / Feature warnings
-    const warningsEl = document.getElementById('brain-input-warnings');
-    if (warningsEl) {
-      const diag = brainData.diagnostics || {};
-      const warns = diag.feature_warnings || [];
-      if (warns.length > 0) {
-        warningsEl.innerHTML = `<div class="brain-warn-tag">⚠ ${warns.length} feature warnings</div>
-          <div class="brain-warn-list">${warns.slice(0, 10).map(w => `<div class="warn-item">${w}</div>`).join('')}</div>`;
-      } else {
-        warningsEl.innerHTML = '<div class="brain-ok-tag">✓ All 80 features mapped</div>';
-      }
-    }
-
-    // 6. Inference latency
-    const latEl = document.getElementById('brain-latency-val');
-    if (latEl) {
-      const diag = brainData.diagnostics || {};
-      latEl.textContent = diag.inference_latency_ms != null
-        ? `${diag.inference_latency_ms.toFixed(1)} ms`
-        : '—';
+    // Safety Governor status in status strip
+    const govStatus = document.getElementById('ctrl-safety-status');
+    if (govStatus && data.safety_status) {
+      govStatus.textContent = data.safety_status;
+      govStatus.style.color = data.safety_status === 'ACTIVE' ? '#3fb950' : data.safety_status === 'CLAMPED' ? '#d29922' : '#f85149';
     }
   }
 
-  /**
-   * Update model info strip from /api/brain/status response.
-   */
-  function updateBrainStatusDom(statusData) {
-    if (!statusData || !statusData.brain) return;
-    const brain = statusData.brain;
-
-    const verEl = document.getElementById('brain-model-ver');
-    if (verEl) verEl.textContent = brain.model_version || '—';
-
-    const archEl = document.getElementById('brain-architecture');
-    if (archEl) archEl.textContent = brain.architecture || '—';
-
-    const featEl = document.getElementById('brain-feature-count');
-    if (featEl) featEl.textContent = brain.feature_count || '—';
-
-    const clsEl = document.getElementById('brain-class-count');
-    if (clsEl) clsEl.textContent = brain.class_count || '—';
-
-    const accEl = document.getElementById('brain-test-acc');
-    if (accEl) {
-      accEl.textContent = brain.test_accuracy != null
-        ? `${(brain.test_accuracy * 100).toFixed(1)}%`
-        : '—';
-    }
-
-    const badgeEl = document.getElementById('brain-status-badge');
-    if (badgeEl) {
-      badgeEl.textContent = brain.status || 'UNAVAILABLE';
-      badgeEl.className = `brain-status-badge brain-st-${(brain.status || 'unavailable').toLowerCase()}`;
-    }
-  }
-
-  /**
-   * Render the AI vs Simulator setpoint trend line chart on canvas.
-   */
-  function _renderBrainTrendChart() {
-    const canvas = document.getElementById('brain-trend-canvas');
-    if (!canvas || _brainTrendHistory.length < 2) return;
-
-    const ctx = canvas.getContext('2d');
-    const W = canvas.width;
-    const H = canvas.height;
-    const pad = { t: 18, r: 12, b: 24, l: 42 };
-    const plotW = W - pad.l - pad.r;
-    const plotH = H - pad.t - pad.b;
-
-    ctx.clearRect(0, 0, W, H);
-
-    // Determine Y range
-    const allVals = _brainTrendHistory.flatMap(p => [p.ai, p.sim]);
-    const yMin = Math.floor(Math.min(...allVals) * 2) / 2 - 0.5;
-    const yMax = Math.ceil(Math.max(...allVals) * 2) / 2 + 0.5;
-    const yRange = Math.max(yMax - yMin, 1);
-
-    // Grid
-    ctx.strokeStyle = 'rgba(139,148,158,0.15)';
-    ctx.lineWidth = 1;
-    for (let y = yMin; y <= yMax; y += 0.5) {
-      const py = pad.t + plotH - ((y - yMin) / yRange) * plotH;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, py);
-      ctx.lineTo(pad.l + plotW, py);
-      ctx.stroke();
-
-      ctx.fillStyle = '#8b949e';
-      ctx.font = '10px monospace';
-      ctx.textAlign = 'right';
-      ctx.fillText(`${y.toFixed(1)}`, pad.l - 4, py + 3);
-    }
-
-    const n = _brainTrendHistory.length;
-    const xStep = plotW / Math.max(n - 1, 1);
-
-    // AI line (blue)
-    ctx.strokeStyle = '#58a6ff';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    _brainTrendHistory.forEach((p, i) => {
-      const px = pad.l + i * xStep;
-      const py = pad.t + plotH - ((p.ai - yMin) / yRange) * plotH;
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    });
-    ctx.stroke();
-
-    // Simulator line (amber)
-    ctx.strokeStyle = '#d29922';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    _brainTrendHistory.forEach((p, i) => {
-      const px = pad.l + i * xStep;
-      const py = pad.t + plotH - ((p.sim - yMin) / yRange) * plotH;
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    });
-    ctx.stroke();
-
-    // Legend
-    ctx.font = '10px monospace';
-    ctx.fillStyle = '#58a6ff';
-    ctx.fillText('● AI Prediction', pad.l + 4, pad.t - 4);
-    ctx.fillStyle = '#d29922';
-    ctx.fillText('● Simulator', pad.l + 120, pad.t - 4);
-  }
-
-  /**
-   * Clear brain trend history (call on scenario change).
-   */
-  function clearBrainTrendHistory() {
-    _brainTrendHistory.length = 0;
-    const canvas = document.getElementById('brain-trend-canvas');
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-  }
+  // ==========================================================================
+  // EXPORTED FUNCTIONS
+  // ==========================================================================
 
   window.HVEAC_PAGES = {
     renderOverview,
@@ -1807,9 +1539,6 @@
     renderEnvironment,
     renderSimulation,
     updateSimulationDom,
-    updateBrainShadowDom,
-    updateBrainStatusDom,
-    clearBrainTrendHistory,
     renderThermal,
     renderHvac,
     renderAnalytics,

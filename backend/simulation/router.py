@@ -1,6 +1,9 @@
 """
 FastAPI REST and WebSocket Router for HVEAC V3 Simulation Lab.
 
+Runtime controller: THERMAL CONTROL ALGORITHM (prototype deterministic)
+No optimizer. No AI model.
+
 Endpoints:
 - GET  /api/simulation/scenarios
 - GET  /api/simulation/state
@@ -10,6 +13,8 @@ Endpoints:
 - POST /api/simulation/reset
 - POST /api/simulation/speed
 - GET  /api/simulation/comparison
+- GET  /api/simulation/control-mode
+- POST /api/simulation/control-mode
 - WS   /ws/simulation
 """
 
@@ -116,59 +121,25 @@ async def get_simulation_comparison():
     }
 
 
-@router.get("/api/simulation/ai-shadow")
-async def get_ai_shadow_state():
-    """
-    Returns the full HVEAC Brain shadow prediction state.
-
-    This is SHADOW MODE ONLY:
-    - The prediction is returned for UI display and comparison.
-    - There is NO automated action path.
-    - The simulation continues using its own rule-based optimizer.
-    """
-    from backend.simulation.manager import _get_shadow_predictor
-
-    shadow = _get_shadow_predictor()
-    if shadow is None:
-        return {
-            "enabled": False,
-            "mode": "SHADOW",
-            "status": "UNAVAILABLE",
-            "model_version": "hveac_brain_v1",
-            "control_path": False,
-            "error": "Shadow predictor not initialized",
-        }
-
-    return {
-        "shadow_state": shadow.get_full_shadow_state(),
-        "metrics": shadow.get_metrics(),
-        "history": shadow.get_history()[-60:],  # Last 60 data points for chart
-        "feature_snapshot": shadow.get_grouped_features(),
-        "feature_warnings": shadow.get_feature_warnings(),
-        "mode": "SHADOW",
-        "control_path": False,
-    }
-
-
 class ControlModeRequest(BaseModel):
-    control_mode: str = Field(..., description="Control mode: BASELINE, SHADOW, or AI_CONTROL")
+    control_mode: str = Field(..., description="Control mode: PROTOTYPE_CONTROL")
 
 
 @router.get("/api/simulation/control-mode")
 async def get_simulation_control_mode():
-    """Returns active simulation control mode (BASELINE, SHADOW; AI_CONTROL disabled)."""
+    """Returns active simulation control mode."""
     return {
         "control_mode": global_simulation_manager.control_mode,
         "allowed_modes": global_simulation_manager.allowed_control_modes,
-        "disabled_modes": getattr(global_simulation_manager, "disabled_control_modes", {}),
-        "control_path": "SIMULATOR_ONLY",
+        "control_authority": "THERMAL CONTROL ALGORITHM",
+        "control_path": "THERMAL_CONTROL_ALGORITHM → SAFETY_GOVERNOR → HVAC",
         "is_synthetic": True,
     }
 
 
 @router.post("/api/simulation/control-mode")
 async def set_simulation_control_mode(req: ControlModeRequest):
-    """Sets simulation control mode (BASELINE, SHADOW, AI_CONTROL)."""
+    """Sets simulation control mode."""
     try:
         result = await global_simulation_manager.set_control_mode(req.control_mode)
         return result
@@ -176,24 +147,11 @@ async def set_simulation_control_mode(req: ControlModeRequest):
         raise HTTPException(status_code=400, detail=str(ve))
 
 
-@router.get("/api/simulation/ai-control")
-async def get_ai_control_state():
-    """Returns AI control closed-loop evaluation metrics and recent safety events."""
-    return {
-        "control_mode": global_simulation_manager.control_mode,
-        "control_path": "SIMULATOR_ONLY",
-        "metrics": global_simulation_manager._closed_loop_metrics,
-        "active_scenario_id": global_simulation_manager.scenario_id,
-        "events": global_simulation_manager._scenario_events.get(global_simulation_manager.scenario_id, [])[-30:],
-        "is_synthetic": True,
-    }
-
-
 @router.websocket("/ws/simulation")
 async def websocket_simulation_endpoint(websocket: WebSocket):
     """
     WebSocket endpoint streaming live simulation updates (~10 Hz).
-    Allows client to receive real-time thermal evolution and send play/pause/mode commands.
+    Allows client to receive real-time thermal evolution and send play/pause commands.
     """
     await global_simulation_manager.register_client(websocket)
     try:
@@ -201,7 +159,6 @@ async def websocket_simulation_endpoint(websocket: WebSocket):
             # Listen for optional incoming client controls over WebSocket
             data = await websocket.receive_text()
             try:
-                msg = pydantic_parse = None
                 import json
                 msg = json.loads(data)
                 cmd = msg.get("action")
@@ -218,7 +175,7 @@ async def websocket_simulation_endpoint(websocket: WebSocket):
                     spd = msg.get("speed", 10)
                     await global_simulation_manager.set_speed(spd)
                 elif cmd == "control_mode":
-                    mode = msg.get("control_mode", "BASELINE")
+                    mode = msg.get("control_mode", "PROTOTYPE_CONTROL")
                     await global_simulation_manager.set_control_mode(mode)
             except Exception:
                 pass

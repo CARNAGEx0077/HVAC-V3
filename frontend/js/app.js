@@ -30,9 +30,6 @@
     renderEnvironment,
     renderSimulation,
     updateSimulationDom,
-    updateBrainShadowDom,
-    updateBrainStatusDom,
-    clearBrainTrendHistory,
     renderThermal,
     renderHvac,
     renderAnalytics,
@@ -151,23 +148,6 @@
             window.HVEAC_SIM_VISUALS.renderHistoryChart(chartCanvas, simHistory);
           }
         }
-        // Populate brain status (from cache or REST)
-        if (_cachedBrainStatus) {
-          updateBrainStatusDom(_cachedBrainStatus);
-        } else {
-          fetchBrainStatus();
-        }
-        // Attach feature inspector lazy-load listener
-        setTimeout(() => {
-          const inspector = document.querySelector('.brain-inputs-inspector');
-          if (inspector) {
-            inspector.addEventListener('toggle', (e) => {
-              if (inspector.open) {
-                fetchFeatureInspector();
-              }
-            });
-          }
-        }, 100);
       }
     }
   }
@@ -373,54 +353,8 @@
                 window.HVEAC_SIM_VISUALS.renderHistoryChart(chartCanvas, simHistory);
               }
 
-              // ── HVEAC Brain Shadow & Closed-Loop Control Update from WS payload ──
-              const aiShadow = msg.ai_shadow;
-              let brainPayload = null;
-              if (aiShadow && aiShadow.status !== 'WAITING') {
-                // Transform WS format → DOM updater format
-                brainPayload = {
-                  status: aiShadow.status,
-                  prediction: {
-                    ai_setpoint_c: aiShadow.predicted_setpoint_c,
-                    confidence: aiShadow.confidence,
-                    class_probabilities: aiShadow.class_probabilities,
-                  },
-                  simulator: {
-                    setpoint_c: aiShadow.simulator_setpoint_c,
-                    action: aiShadow.simulator_action,
-                  },
-                  comparison: {
-                    agreement: aiShadow.agreement,
-                    deviation_c: aiShadow.deviation_c,
-                  },
-                  diagnostics: {
-                    feature_warnings: aiShadow.feature_warnings || [],
-                    feature_count: aiShadow.feature_count || 0,
-                    inference_latency_ms: aiShadow.inference_latency_ms,
-                  },
-                  simulation_context: {
-                    simulation_time_seconds: msg.simulation_time_seconds,
-                    scenario_id: msg.scenario_id,
-                    step_index: msg.step_index,
-                  },
-                };
-              }
-              updateBrainShadowDom(brainPayload, msg);
-
-              // Update model status from WS data
-              if (aiShadow && aiShadow.model_status) {
-                _cachedBrainStatus = {
-                  brain: {
-                    status: aiShadow.model_status,
-                    model_version: aiShadow.model_version,
-                    architecture: aiShadow.model_architecture,
-                    feature_count: aiShadow.model_feature_count,
-                    class_count: aiShadow.model_class_count,
-                    test_accuracy: aiShadow.model_test_accuracy,
-                  }
-                };
-                updateBrainStatusDom(_cachedBrainStatus);
-              }
+              // Thermal Control Algorithm updates are included in the simulation_update payload
+              // and processed by updateSimulationDom (section 9).
             }
           }
         } catch (parseErr) {
@@ -443,60 +377,9 @@
   }
 
   // ════════════════════════════════════════════════════════════════════════
-  // HVEAC BRAIN — Shadow Mode (WS-driven + REST fallback)
+  // THERMAL CONTROL ALGORITHM — No AI model, no shadow mode
+  // Control telemetry is delivered via the standard WebSocket simulation_update payload.
   // ════════════════════════════════════════════════════════════════════════
-  let _cachedBrainStatus = null;
-
-  /**
-   * Fetch model status/metadata and populate the info strip.
-   */
-  async function fetchBrainStatus() {
-    try {
-      const resp = await fetch('/api/brain/status');
-      if (resp.ok) {
-        const data = await resp.json();
-        _cachedBrainStatus = data;
-        updateBrainStatusDom(data);
-      }
-    } catch (err) {
-      console.warn('[HVEAC Brain] Failed to fetch brain status:', err);
-    }
-  }
-
-  /**
-   * Lazy-load feature inspector data from REST endpoint.
-   * Called when user expands the MODEL INPUTS INSPECTOR panel.
-   */
-  async function fetchFeatureInspector() {
-    try {
-      const resp = await fetch('/api/simulation/ai-shadow');
-      if (resp.ok) {
-        const data = await resp.json();
-        const grid = document.getElementById('brain-inputs-grid');
-        if (grid && data.feature_snapshot) {
-          let html = '';
-          const groups = data.feature_snapshot;
-          for (const [groupName, features] of Object.entries(groups)) {
-            html += `<div class="fi-group"><div class="fi-group-title">${groupName}</div>`;
-            features.forEach(f => {
-              const val = f.value != null
-                ? (typeof f.value === 'number' ? f.value.toFixed(2) : f.value)
-                : '—';
-              html += `<div class="fi-row">
-                <span class="fi-name">${f.feature}</span>
-                <span class="fi-val">${val}</span>
-                <span class="fi-unit">${f.unit || ''}</span>
-              </div>`;
-            });
-            html += '</div>';
-          }
-          grid.innerHTML = html;
-        }
-      }
-    } catch (err) {
-      // Silent — inspector is a debug tool
-    }
-  }
 
   /**
    * Event delegation for interactive buttons and simulation controls
@@ -546,28 +429,11 @@
       if (btnReset) {
         e.preventDefault();
         simHistory.length = 0; // Clear rolling chart history on reset
-        clearBrainTrendHistory();
         await resetSimulation();
         return;
       }
 
-      // 3b. Simulation Control Mode (BASELINE, SHADOW, AI_CONTROL)
-      const modeBtn = e.target.closest('[data-mode]');
-      if (modeBtn) {
-        e.preventDefault();
-        const mode = modeBtn.getAttribute('data-mode');
-        if (mode === 'AI_CONTROL' || modeBtn.disabled) {
-          alert('AI Closed-Loop Control is temporarily DISABLED pending the Critical Thermal Control Audit.\n\nOnly BASELINE and SHADOW modes are currently allowed.');
-          return;
-        }
-        if (mode && window.HVEAC_STATE && window.HVEAC_STATE.setSimulationControlMode) {
-          await window.HVEAC_STATE.setSimulationControlMode(mode);
-          document.querySelectorAll('.btn-ctrl-mode').forEach(b => b.classList.toggle('active', b === modeBtn));
-          const banner = document.getElementById('ai-control-banner');
-          if (banner) banner.style.display = mode === 'AI_CONTROL' ? 'flex' : 'none';
-        }
-        return;
-      }
+      // 3b. Control mode is fixed to PROTOTYPE_CONTROL — no mode switching needed
 
       // 4. Simulation Speed Selector
       const speedBtn = e.target.closest('[data-speed]');
@@ -590,9 +456,6 @@
         if (sid) {
           simHistory.length = 0;
           window._simSelectedCompId = null;
-          clearBrainTrendHistory();
-          // Reset feature adapter rolling history
-          fetch('/api/brain/adapter-reset', { method: 'POST' }).catch(() => { });
           await selectSimulationScenario(sid);
           renderView();
         }

@@ -22,7 +22,13 @@ from backend.occupancy.tracker import PersonTracker
 from backend.occupancy.engine import OccupancyEngine
 from backend.api import routes, websocket
 from backend.simulation import router as simulation_router
-from ml.brain_api import router as brain_router
+
+# Brain API is optional — prototype works without ML models
+try:
+    from ml.brain_api import router as brain_router
+except Exception:
+    brain_router = None
+    logging.getLogger("hveac.main").info("[STARTUP] Brain API unavailable (no ML model) — prototype control active")
 
 # Configure logging format
 logging.basicConfig(
@@ -123,7 +129,8 @@ app.add_middleware(
 app.include_router(routes.router)
 app.include_router(websocket.router)
 app.include_router(simulation_router.router)
-app.include_router(brain_router)
+if brain_router is not None:
+    app.include_router(brain_router)
 
 # Mount frontend static files
 frontend_path = config.FRONTEND_DIR

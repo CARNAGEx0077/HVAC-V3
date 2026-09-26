@@ -2894,8 +2894,8 @@ html, body {
 
 .compact-event-log {
   margin-top: 10px;
-  max-height: 140px;
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
   border: 1px solid var(--border-subtle, #30363d);
   border-radius: 3px;
   background: #090d13;
@@ -2979,4 +2979,578 @@ html, body {
   padding: 10px;
   text-align: center;
   font-style: italic;
+}
+
+/* ==========================================================================
+   HVEAC V3 SIMULATION LAB — ENGINEERING UI POLISH & REDESIGN
+   ========================================================================== */
+
+/* ── Workstation Top Header ────────────────────────────────────────────── */
+.sim-workstation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #0d1117;
+  border-bottom: 1px solid #21262d;
+  margin-bottom: 8px;
+}
+
+.sw-page-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #f0f6fc;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.sw-brand-sub {
+  font-size: 13px;
+  font-weight: 600;
+  color: #8b949e;
+  letter-spacing: 0.06em;
+}
+
+/* ── Control Mode & Playback Bar ────────────────────────────────────────── */
+.sim-control-mode-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #111620;
+  border: 1px solid #263040;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.control-mode-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ctrl-mode-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #8b949e;
+  text-transform: uppercase;
+}
+
+.mode-badge-prototype {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #58a6ff;
+  background: rgba(56, 139, 253, 0.12);
+  border: 1px solid rgba(56, 139, 253, 0.35);
+  border-radius: 3px;
+  padding: 3px 10px;
+  letter-spacing: 0.05em;
+}
+
+.status-chip-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-chip {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.status-chip-active {
+  color: #3fb950;
+  background: rgba(63, 185, 80, 0.12);
+  border: 1px solid rgba(63, 185, 80, 0.3);
+}
+
+.status-chip-ctrl {
+  color: #79c0ff;
+  background: rgba(56, 139, 253, 0.08);
+  border: 1px solid rgba(56, 139, 253, 0.2);
+}
+
+.status-chip-ai {
+  color: #d29922;
+  background: rgba(210, 153, 34, 0.08);
+  border: 1px solid rgba(210, 153, 34, 0.25);
+}
+
+.control-mode-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── System Status Strip ────────────────────────────────────────────────── */
+.sim-status-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  background: #111620;
+  border: 1px solid #263040;
+  border-radius: 4px;
+}
+
+.status-strip-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-strip-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #8b949e;
+  text-transform: uppercase;
+}
+
+.status-strip-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e6edf3;
+}
+
+/* ── KPI Cards Row ──────────────────────────────────────────────────────── */
+.sim-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 1024px) {
+  .sim-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .sim-kpi-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sim-kpi-card {
+  background: #161c28;
+  border: 1px solid #263040;
+  border-radius: 4px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sim-kpi-card .kpi-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #8b949e;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.sim-kpi-card .kpi-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: #e6edf3;
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+
+.sim-kpi-card .kpi-sub {
+  font-size: 11px;
+  color: #8b949e;
+  line-height: 1.35;
+}
+
+/* ── Generic Card Section ───────────────────────────────────────────────── */
+.sim-card-section {
+  background: #111620;
+  border: 1px solid #263040;
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin-top: 16px;
+}
+
+.card-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #1c2330;
+  margin-bottom: 12px;
+}
+
+.card-title-eng {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #e6edf3;
+  text-transform: uppercase;
+}
+
+.card-subtitle-eng {
+  font-size: 11px;
+  color: #8b949e;
+}
+
+/* ── Zone Telemetry Grid ────────────────────────────────────────────────── */
+.sim-zone-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 1024px) {
+  .sim-zone-telemetry-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .sim-zone-telemetry-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.zone-telemetry-card {
+  background: #161c28;
+  border: 1px solid #263040;
+  border-radius: 4px;
+  padding: 12px 14px;
+}
+
+.zone-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #212936;
+}
+
+.zone-card-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e6edf3;
+  letter-spacing: 0.04em;
+}
+
+.zone-card-loc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: #8b949e;
+  background: rgba(139, 148, 158, 0.1);
+  padding: 1px 6px;
+  border-radius: 2px;
+}
+
+.zone-card-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.zone-metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.zone-metric-lbl {
+  color: #8b949e;
+  font-size: 11px;
+}
+
+.zone-metric-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: #e6edf3;
+}
+
+/* ── AC Telemetry Grid ──────────────────────────────────────────────────── */
+.sim-ac-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 1024px) {
+  .sim-ac-telemetry-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .sim-ac-telemetry-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ac-telemetry-card {
+  background: #161c28;
+  border: 1px solid #263040;
+  border-radius: 4px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ac-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #212936;
+}
+
+.ac-card-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e6edf3;
+  letter-spacing: 0.04em;
+}
+
+.ac-card-wall {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: #8b949e;
+  background: rgba(139, 148, 158, 0.1);
+  padding: 1px 6px;
+  border-radius: 2px;
+}
+
+.ac-card-primary {
+  margin-bottom: 8px;
+}
+
+.ac-cooling-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.ac-cooling-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px;
+  font-weight: 700;
+  color: #3fb950;
+  line-height: 1.1;
+}
+
+.ac-setpoint-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #8b949e;
+  border-top: 1px solid #212936;
+  padding-top: 6px;
+}
+
+.ac-sp-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: #e6edf3;
+}
+
+/* ── Runtime Control Pipeline (Sections 15, 16, 17, 18) ─────────────────── */
+.sim-pipeline-section {
+  background: #111620;
+  border: 1px solid #263040;
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin-top: 16px;
+}
+
+.sim-pipeline-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+@media (max-width: 1200px) {
+  .sim-pipeline-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .pipeline-arrow {
+    transform: rotate(90deg);
+    padding: 2px 0;
+  }
+}
+
+.pipeline-step-card {
+  background: #161c28;
+  border: 1px solid #263040;
+  border-radius: 4px;
+  padding: 10px 12px;
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pipeline-step-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.pipeline-step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #388bfd;
+  background: rgba(56, 139, 253, 0.12);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.pipeline-step-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e6edf3;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pipeline-step-desc {
+  font-size: 11px;
+  color: #8b949e;
+  line-height: 1.35;
+}
+
+.pipeline-arrow {
+  color: #58a6ff;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  user-select: none;
+}
+
+.sim-decision-summary-card {
+  margin-top: 12px;
+  background: #161c28;
+  border: 1px solid #263040;
+  border-left: 3px solid #388bfd;
+  border-radius: 3px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.decision-summary-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #8b949e;
+  text-transform: uppercase;
+}
+
+.decision-summary-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e6edf3;
+  letter-spacing: 0.02em;
+}
+
+/* ── Scenario Catalog Styling (Sections 19, 20, 21) ─────────────────────── */
+.sim-scenario-card.card-active {
+  border: 1px solid #388bfd !important;
+  border-top: 3px solid #388bfd !important;
+  background: #182234 !important;
+}
+
+.sc-status-tag.sc-status-active {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  background: #1f6feb !important;
+  padding: 2px 7px !important;
+  border-radius: 2px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+}
+
+/* ── Collapsible Workstation Drawer ────────────────────────────────────── */
+.sim-collapsible-nodes {
+  background: #111620;
+  border: 1px solid #263040;
+  border-radius: 4px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+}
+
+.sim-nodes-summary {
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  color: #e6edf3;
+}
+
+.sim-nodes-summary:hover {
+  background: #161c28;
+}
+
+.nodes-summary-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #e6edf3;
+  text-transform: uppercase;
+}
+
+.nodes-summary-sub {
+  font-size: 11px;
+  font-weight: 400;
+  color: #8b949e;
+}
+
+.sim-nodes-content {
+  padding: 14px 16px;
+  border-top: 1px solid #1c2330;
 }

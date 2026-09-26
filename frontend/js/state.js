@@ -75,7 +75,7 @@
       stepIndex: 0,
       totalSteps: 720,
       pitchMode: false,
-      controlMode: 'BASELINE',
+      controlMode: 'PROTOTYPE_CONTROL',
       scenarios: [],
       comparisons: [],
       selectedComputerId: null,
