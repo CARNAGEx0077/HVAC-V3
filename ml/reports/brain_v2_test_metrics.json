@@ -1,0 +1,194 @@
+{
+  "selected_model": "Random Forest",
+  "metrics": {
+    "accuracy": 0.7414,
+    "balanced_accuracy": 0.4162,
+    "macro_precision": 0.6714,
+    "macro_recall": 0.4162,
+    "macro_f1": 0.3824,
+    "weighted_f1": 0.6525,
+    "mae_deg_c": 0.1558,
+    "rmse_deg_c": 0.3232,
+    "median_ae_deg_c": 0.0,
+    "max_ae_deg_c": 1.0,
+    "pct_within_0_25_c": 74.14,
+    "pct_within_0_50_c": 94.69,
+    "pct_within_1_00_c": 100.0
+  },
+  "per_class": {
+    "22.0": {
+      "setpoint_c": 22.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 0
+    },
+    "22.5": {
+      "setpoint_c": 22.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 0
+    },
+    "23.0": {
+      "setpoint_c": 23.0,
+      "precision": 0.9231,
+      "recall": 0.0204,
+      "f1": 0.04,
+      "support": 587
+    },
+    "23.5": {
+      "setpoint_c": 23.5,
+      "precision": 0.925,
+      "recall": 0.0934,
+      "f1": 0.1696,
+      "support": 1585
+    },
+    "24.0": {
+      "setpoint_c": 24.0,
+      "precision": 0.6724,
+      "recall": 0.9873,
+      "f1": 0.8,
+      "support": 4329
+    },
+    "24.5": {
+      "setpoint_c": 24.5,
+      "precision": 0.8366,
+      "recall": 0.98,
+      "f1": 0.9026,
+      "support": 3646
+    },
+    "25.0": {
+      "setpoint_c": 25.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 653
+    }
+  },
+  "confusion_matrix": [
+    [
+      12,
+      2,
+      573,
+      0,
+      0
+    ],
+    [
+      1,
+      148,
+      1436,
+      0,
+      0
+    ],
+    [
+      0,
+      10,
+      4274,
+      45,
+      0
+    ],
+    [
+      0,
+      0,
+      73,
+      3573,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      653,
+      0
+    ]
+  ],
+  "directional_audit": {
+    "status": "PASS",
+    "cases": {
+      "CASE_A_HOT_RISING_HIGH_LOAD": {
+        "description": "25.5\u00b0C rising with 3500W load -> cooling target <= 25.0\u00b0C",
+        "predicted_setpoint": 24.0,
+        "passed": true
+      },
+      "CASE_B_HOT_RISING_MODERATE_LOAD": {
+        "description": "25.0\u00b0C rising with 1800W load -> cooling target <= 24.5\u00b0C",
+        "predicted_setpoint": 24.0,
+        "passed": true
+      },
+      "CASE_C_STABLE_ACCEPTABLE": {
+        "description": "23.5\u00b0C stable with low load -> maintain/relax target >= 23.5\u00b0C",
+        "predicted_setpoint": 24.5,
+        "passed": true
+      },
+      "CASE_D_COOL_ROOM": {
+        "description": "22.0\u00b0C cool room -> reduce cooling target >= 23.0\u00b0C",
+        "predicted_setpoint": 24.5,
+        "passed": true
+      },
+      "CASE_E_LOAD_MONOTONICITY": {
+        "description": "Increasing thermal load (800W-4000W) must not increase setpoint",
+        "load_predictions": [
+          24.5,
+          24.5,
+          24.5,
+          24.5,
+          24.5
+        ],
+        "passed": true
+      }
+    }
+  },
+  "counterfactual_audit": {
+    "status": "PASS",
+    "sample_count": 150,
+    "experiments": {
+      "EXP_A_INCREASE_TEMP": {
+        "perturbation": "+2.0\u00b0C Room & Zone Temperature",
+        "mean_delta_c": -0.5267,
+        "expected_direction": "COOLING_ORIENTATION (delta <= 0)",
+        "violations_warmer": 0,
+        "passed": true
+      },
+      "EXP_B_INCREASE_TOTAL_LOAD": {
+        "perturbation": "+2000W Total Heat Load",
+        "mean_delta_c": -0.0033,
+        "expected_direction": "COOLING_ORIENTATION (delta <= 0)",
+        "violations_warmer": 0,
+        "passed": true
+      },
+      "EXP_C_INCREASE_COMPUTER_HEAT": {
+        "perturbation": "+1500W Total Computer Heat",
+        "mean_delta_c": 0.0,
+        "expected_direction": "COOLING_ORIENTATION (delta <= 0)",
+        "violations_warmer": 0,
+        "passed": true
+      },
+      "EXP_D_INCREASE_OCCUPANCY_HEAT": {
+        "perturbation": "+500W Occupancy Heat (+5 occupants)",
+        "mean_delta_c": 0.0,
+        "expected_direction": "COOLING_ORIENTATION (delta <= 0)",
+        "violations_warmer": 0,
+        "passed": true
+      },
+      "EXP_E_DECREASE_TEMP": {
+        "perturbation": "-2.0\u00b0C Room & Zone Temperature",
+        "mean_delta_c": 0.2233,
+        "expected_direction": "ENERGY_SAVING / RELAX_COOLING (delta >= 0)",
+        "violations_cooler": 0,
+        "passed": true
+      }
+    }
+  },
+  "temporal_metrics": {
+    "total_test_scenarios": 15,
+    "total_prediction_transitions": 44,
+    "mean_transitions_per_scenario": 2.93,
+    "changes_per_hour": 1.47,
+    "mean_dwell_timesteps": 183.05,
+    "mean_dwell_seconds": 1830.5,
+    "min_dwell_timesteps": 1,
+    "max_prediction_jump_c": 0.5,
+    "stability_status": "PASS"
+  }
+}

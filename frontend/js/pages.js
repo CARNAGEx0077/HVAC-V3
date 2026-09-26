@@ -20,29 +20,29 @@
     const metricsHtml = `
       <div class="metrics-grid grid-cols-4">
         ${MetricCard({
-          label: 'OCCUPANCY',
-          value: state.overviewMetrics.occupancy,
-          subtext: state.overviewMetrics.occupancySub,
-          id: 'card-occupancy'
-        })}
+      label: 'OCCUPANCY',
+      value: state.overviewMetrics.occupancy,
+      subtext: state.overviewMetrics.occupancySub,
+      id: 'card-occupancy'
+    })}
         ${MetricCard({
-          label: 'COMPUTER NODES',
-          value: state.overviewMetrics.nodes,
-          subtext: state.overviewMetrics.nodesSub,
-          id: 'card-nodes'
-        })}
+      label: 'COMPUTER NODES',
+      value: state.overviewMetrics.nodes,
+      subtext: state.overviewMetrics.nodesSub,
+      id: 'card-nodes'
+    })}
         ${MetricCard({
-          label: state.overviewMetrics.computerHeatLabel || 'COMPUTER HEAT',
-          value: state.overviewMetrics.computerHeat,
-          subtext: state.overviewMetrics.computerHeatSub,
-          id: 'card-heat'
-        })}
+      label: state.overviewMetrics.computerHeatLabel || 'COMPUTER HEAT',
+      value: state.overviewMetrics.computerHeat,
+      subtext: state.overviewMetrics.computerHeatSub,
+      id: 'card-heat'
+    })}
         ${MetricCard({
-          label: 'OUTDOOR TEMP',
-          value: state.overviewMetrics.outdoorTemp,
-          subtext: state.overviewMetrics.outdoorTempSub,
-          id: 'card-temp'
-        })}
+      label: 'OUTDOOR TEMP',
+      value: state.overviewMetrics.outdoorTemp,
+      subtext: state.overviewMetrics.outdoorTempSub,
+      id: 'card-temp'
+    })}
       </div>
     `;
 
@@ -60,23 +60,23 @@
     const metricsHtml = `
       <div class="metrics-grid grid-cols-3">
         ${MetricCard({
-          label: 'CURRENT OCCUPANCY',
-          value: state.occupancy.currentCount,
-          subtext: 'People',
-          id: 'card-occ-count'
-        })}
+      label: 'CURRENT OCCUPANCY',
+      value: state.occupancy.currentCount,
+      subtext: 'People',
+      id: 'card-occ-count'
+    })}
         ${MetricCard({
-          label: 'CONFIDENCE',
-          value: state.occupancy.confidence,
-          subtext: 'Detection confidence',
-          id: 'card-occ-confidence'
-        })}
+      label: 'CONFIDENCE',
+      value: state.occupancy.confidence,
+      subtext: 'Detection confidence',
+      id: 'card-occ-confidence'
+    })}
         ${MetricCard({
-          label: 'CAMERA STATUS',
-          value: state.occupancy.cameraStatus,
-          subtext: `Processing FPS: ${state.occupancy.fps}`,
-          id: 'card-occ-status'
-        })}
+      label: 'CAMERA STATUS',
+      value: state.occupancy.cameraStatus,
+      subtext: `Processing FPS: ${state.occupancy.fps}`,
+      id: 'card-occ-status'
+    })}
       </div>
     `;
 
@@ -134,30 +134,30 @@
     const metricsHtml = `
       <div class="metrics-grid grid-cols-5">
         ${MetricCard({
-          label: 'NODES ONLINE',
-          value: state.nodes.onlineCount,
-          subtext: 'Active compute nodes'
-        })}
+      label: 'NODES ONLINE',
+      value: state.nodes.onlineCount,
+      subtext: 'Active compute nodes'
+    })}
         ${MetricCard({
-          label: 'TOTAL NODES',
-          value: state.nodes.totalCount,
-          subtext: 'Cluster inventory'
-        })}
+      label: 'TOTAL NODES',
+      value: state.nodes.totalCount,
+      subtext: 'Cluster inventory'
+    })}
         ${MetricCard({
-          label: heatLabel,
-          value: state.nodes.totalHeatWatts,
-          subtext: heatSubtext
-        })}
+      label: heatLabel,
+      value: state.nodes.totalHeatWatts,
+      subtext: heatSubtext
+    })}
         ${MetricCard({
-          label: 'AVG CPU LOAD',
-          value: state.nodes.avgCpu,
-          subtext: 'Cluster average utilization'
-        })}
+      label: 'AVG CPU LOAD',
+      value: state.nodes.avgCpu,
+      subtext: 'Cluster average utilization'
+    })}
         ${MetricCard({
-          label: 'AVG NODE THERMAL',
-          value: state.nodes.avgNodeThermalLoad || 'N/A',
-          subtext: 'Aggregate thermal load index'
-        })}
+      label: 'AVG NODE THERMAL',
+      value: state.nodes.avgNodeThermalLoad || 'N/A',
+      subtext: 'Aggregate thermal load index'
+    })}
       </div>
     `;
 
@@ -224,20 +224,20 @@
     const metricsHtml = `
       <div class="metrics-grid grid-cols-3">
         ${MetricCard({
-          label: 'OUTDOOR TEMP',
-          value: state.environment.outdoorTemp,
-          subtext: 'Regional ambient temperature'
-        })}
+      label: 'OUTDOOR TEMP',
+      value: state.environment.outdoorTemp,
+      subtext: 'Regional ambient temperature'
+    })}
         ${MetricCard({
-          label: 'HUMIDITY',
-          value: state.environment.humidity,
-          subtext: 'Relative humidity'
-        })}
+      label: 'HUMIDITY',
+      value: state.environment.humidity,
+      subtext: 'Relative humidity'
+    })}
         ${MetricCard({
-          label: 'SOLAR',
-          value: state.environment.solar,
-          subtext: 'Solar irradiance index'
-        })}
+      label: 'SOLAR',
+      value: state.environment.solar,
+      subtext: 'Solar irradiance index'
+    })}
       </div>
     `;
 
@@ -841,8 +841,8 @@
             </thead>
             <tbody id="sim-nodes-tbody">
               ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(id => {
-                const zoneName = id <= 4 ? 'Z1 NW' : (id <= 6 ? 'Z2 NE' : (id <= 8 ? 'Z3 SE' : 'Z4 SW'));
-                return `
+      const zoneName = id <= 4 ? 'Z1 NW' : (id <= 6 ? 'Z2 NE' : (id <= 8 ? 'Z3 SE' : 'Z4 SW'));
+      return `
                   <tr class="sim-node-row" id="sim-row-c${id}" data-comp-id="${id}">
                     <td class="cell-node-id"><strong>C${id}</strong></td>
                     <td class="cell-zone" id="sim-row-zone-${id}">${zoneName}</td>
@@ -877,7 +877,7 @@
                     </td>
                   </tr>
                 `;
-              }).join('')}
+    }).join('')}
             </tbody>
           </table>
         </div>
@@ -896,8 +896,8 @@
 
         <div class="sim-scenarios-grid">
           ${scenarios.map(s => {
-            const isAct = s.id === activeId;
-            return `
+      const isAct = s.id === activeId;
+      return `
               <div class="sim-scenario-card ${isAct ? 'card-active' : ''}" data-scenario-id="${s.id}">
                 <div class="sc-header">
                   <span class="sc-id">SCENARIO 0${s.id}</span>
@@ -914,7 +914,7 @@
                 </button>
               </div>
             `;
-          }).join('')}
+    }).join('')}
         </div>
       </div>
     `;
@@ -954,68 +954,149 @@
       </div>
     `;
 
-    // 8. HVEAC BRAIN — SHADOW MODE SECTION
+    // 8. HVEAC BRAIN — CLOSED-LOOP & SHADOW CONTROL PANEL
+    const ctrlMode = s.simulation?.controlMode || 'BASELINE';
     const brainShadowSection = `
       <div class="sim-brain-shadow-section" id="sim-brain-shadow-section">
+        <!-- Control Mode Selector Bar (Section 3, 4, 19) -->
+        <div class="sim-ctrl-mode-selector">
+          <span class="ctrl-mode-label">SIMULATION CONTROL MODE</span>
+          <div class="ctrl-mode-buttons">
+            <button class="btn-ctrl-mode ${ctrlMode === 'BASELINE' ? 'active' : ''}" data-mode="BASELINE" id="btn-mode-baseline">BASELINE</button>
+            <button class="btn-ctrl-mode ${ctrlMode === 'SHADOW' ? 'active' : ''}" data-mode="SHADOW" id="btn-mode-shadow">SHADOW</button>
+            <button class="btn-ctrl-mode disabled" data-mode="AI_CONTROL" id="btn-mode-ai" disabled title="AI_CONTROL is temporarily DISABLED pending thermal control audit" style="opacity: 0.55; cursor: not-allowed; border-color: rgba(239, 68, 68, 0.4); color: #f87171;">AI CONTROL [DISABLED - AUDIT]</button>
+          </div>
+        </div>
+
+        <!-- Thermal Control Audit Notice Banner -->
+        <div class="ai-control-audit-banner" style="background: rgba(220, 38, 38, 0.12); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 4px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #fca5a5;">
+          <span><strong style="color: #f87171;">CRITICAL THERMAL CONTROL AUDIT IN PROGRESS:</strong> AI Closed-Loop Control is temporarily DISABLED pending physical control semantics verification. BASELINE and SHADOW modes remain active.</span>
+          <span style="font-family: monospace; font-size: 10px; background: rgba(239,68,68,0.25); color: #fecaca; padding: 2px 6px; border-radius: 2px;">AUDIT ACTIVE</span>
+        </div>
+
+        <!-- AI Control Simulation Notice Banner (Section 4) -->
+        <div class="ai-control-banner" id="ai-control-banner" style="display: ${ctrlMode === 'AI_CONTROL' ? 'flex' : 'none'};">
+          <span class="banner-badge">AI CONTROL — SIMULATION ONLY</span>
+          <span class="banner-note">HVEAC Brain v1 controls simulated room target through Safety Governor. Real hardware connection = STRICTLY DISABLED.</span>
+        </div>
+
+        <!-- Section Header Bar -->
         <div class="section-header-bar">
           <div class="sh-title-group">
-            <h3 class="sh-title">HVEAC BRAIN — SHADOW MODE</h3>
-            <span class="sh-subtitle">AI model predictions for observation only — no HVAC control path</span>
+            <h3 class="sh-title">HVEAC BRAIN — CLOSED-LOOP & SHADOW CONTROL PANEL</h3>
+            <span class="sh-subtitle">Simulation-only setpoint optimization through Safety Governor</span>
           </div>
           <div class="sh-badge-group">
-            <span class="brain-mode-badge">SHADOW ONLY</span>
-            <span class="brain-status-badge" id="brain-status-badge">LOADING…</span>
+            <span class="brain-mode-badge" id="brain-active-badge">MODE: BASELINE</span>
+            <span class="brain-status-badge" id="brain-status-badge">READY</span>
+            <span class="brain-path-badge" id="brain-path-badge">CONTROL: SIMULATOR ONLY</span>
+            <span class="brain-latency-badge" id="brain-latency-badge">LATENCY: <span class="lat-val" id="brain-latency-val">—</span></span>
           </div>
         </div>
 
-        <!-- Model Info Strip -->
+        <!-- Model Authority & Invariants Strip -->
         <div class="brain-info-strip" id="brain-info-strip">
           <div class="brain-info-item">
+            <span class="bi-lbl">CONTROL AUTHORITY:</span>
+            <span class="bi-val highlight-val" id="ctrl-authority">SIMULATOR OPTIMIZER</span>
+          </div>
+          <div class="brain-info-item">
+            <span class="bi-lbl">SAFETY GOVERNOR:</span>
+            <span class="bi-val" id="ctrl-safety-status">ACTIVE</span>
+          </div>
+          <div class="brain-info-item">
             <span class="bi-lbl">MODEL:</span>
-            <span class="bi-val" id="brain-model-ver">—</span>
+            <span class="bi-val" id="brain-model-ver">hveac_brain_v1</span>
           </div>
           <div class="brain-info-item">
-            <span class="bi-lbl">ARCHITECTURE:</span>
-            <span class="bi-val" id="brain-architecture">—</span>
+            <span class="bi-lbl">INPUT FEATURES:</span>
+            <span class="bi-val" id="brain-feature-count">80</span>
           </div>
           <div class="brain-info-item">
-            <span class="bi-lbl">FEATURES:</span>
-            <span class="bi-val" id="brain-feature-count">—</span>
-          </div>
-          <div class="brain-info-item">
-            <span class="bi-lbl">CLASSES:</span>
-            <span class="bi-val" id="brain-class-count">—</span>
-          </div>
-          <div class="brain-info-item">
-            <span class="bi-lbl">TEST ACC:</span>
-            <span class="bi-val" id="brain-test-acc">—</span>
+            <span class="bi-lbl">VALID DOMAIN:</span>
+            <span class="bi-val">24.5°C – 26.5°C</span>
           </div>
         </div>
 
-        <!-- Prediction vs Simulator Comparison -->
-        <div class="brain-comparison-grid">
+        <!-- 4-Card Setpoint Architecture (Sections 19, 20, 26) -->
+        <div class="brain-comparison-grid brain-4grid">
           <div class="brain-compare-card">
             <div class="bcc-header">
-              <span class="bcc-tag bcc-tag-ai">AI PREDICTION</span>
+              <span class="bcc-tag bcc-tag-ai">AI REQUEST</span>
               <span class="bcc-confidence" id="brain-confidence">— %</span>
             </div>
-            <div class="bcc-value" id="brain-ai-setpoint">—</div>
-            <div class="bcc-sub">Predicted optimal room setpoint</div>
+            <div class="bcc-value" id="ctrl-ai-requested">—</div>
+            <div class="bcc-sub">Brain raw predicted setpoint</div>
           </div>
           <div class="brain-compare-card">
             <div class="bcc-header">
-              <span class="bcc-tag bcc-tag-sim">SIMULATOR</span>
-              <span class="bcc-action" id="brain-sim-action">—</span>
+              <span class="bcc-tag bcc-tag-gov">SAFETY GOVERNOR</span>
+              <span class="bcc-action" id="ctrl-safety-status-tag">PASSED</span>
             </div>
-            <div class="bcc-value" id="brain-sim-setpoint">—</div>
-            <div class="bcc-sub">Rule-based optimizer setpoint</div>
+            <div class="bcc-value" id="ctrl-ai-safe">—</div>
+            <div class="bcc-sub" id="ctrl-safety-reason">Rate & Dwell checked</div>
+          </div>
+          <div class="brain-compare-card brain-applied-card">
+            <div class="bcc-header">
+              <span class="bcc-tag bcc-tag-applied">APPLIED SETPOINT</span>
+              <span class="bcc-action" id="ctrl-applied-mode">BASELINE</span>
+            </div>
+            <div class="bcc-value" id="ctrl-ai-applied">—</div>
+            <div class="bcc-sub">Active setpoint in simulator</div>
           </div>
           <div class="brain-compare-card brain-agreement-card">
             <div class="bcc-header">
-              <span class="bcc-tag bcc-tag-compare">COMPARISON</span>
+              <span class="bcc-tag bcc-tag-sim">BASELINE REFERENCE</span>
+              <span class="bcc-agreement" id="brain-agreement">—</span>
             </div>
-            <div class="bcc-agreement" id="brain-agreement">—</div>
-            <div class="bcc-deviation" id="brain-deviation">Deviation: —</div>
+            <div class="bcc-value" id="ctrl-baseline-sp">—</div>
+            <div class="bcc-deviation" id="ctrl-delta-val">Delta: 0.0 °C</div>
+          </div>
+        </div>
+
+        <!-- Live Performance Comparison Area (Sections 21, 22, 36) -->
+        <div class="brain-perf-comparison">
+          <div class="card-title-eng">HVEAC BRAIN vs SIMULATOR OPTIMIZER — PERFORMANCE METRICS (SIMULATED RESULT)</div>
+          <div class="perf-metrics-grid">
+            <div class="pm-box">
+              <div class="pm-label">TOTAL COOLING ENERGY</div>
+              <div class="pm-vals">
+                <span class="pm-base" id="comp-base-energy">7.00 kWh</span> vs 
+                <span class="pm-ai" id="comp-ai-energy">6.24 kWh</span>
+              </div>
+              <div class="pm-delta" id="comp-energy-delta">-10.8% Simulated Result</div>
+            </div>
+            <div class="pm-box">
+              <div class="pm-label">COMFORT BAND (21-24°C)</div>
+              <div class="pm-vals">
+                <span class="pm-base" id="comp-base-comfort">100.0%</span> vs 
+                <span class="pm-ai" id="comp-ai-comfort">12.9%</span>
+              </div>
+              <div class="pm-delta" id="comp-comfort-delta">Standard Band Compliance</div>
+            </div>
+            <div class="pm-box">
+              <div class="pm-label">SETPOINT CHANGES</div>
+              <div class="pm-vals">
+                <span class="pm-base" id="comp-base-changes">0</span> vs 
+                <span class="pm-ai" id="comp-ai-changes">8</span>
+              </div>
+              <div class="pm-sub">Dwell ≥ 60s Enforced</div>
+            </div>
+            <div class="pm-box">
+              <div class="pm-label">SAFETY INTERVENTIONS</div>
+              <div class="pm-vals" id="comp-interventions">
+                Rate: 8 | Dwell: 35 | Fallback: 0
+              </div>
+              <div class="pm-sub">100% Commands Validated</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Control Decision Event Log (Section 27) -->
+        <div class="brain-event-log-section">
+          <div class="card-title-eng">RECENT CONTROL DECISION LOG (SIMULATION ONLY)</div>
+          <div class="compact-event-log" id="ctrl-events-log">
+            <div class="event-row-empty">No control interventions recorded yet.</div>
           </div>
         </div>
 
@@ -1037,7 +1118,7 @@
 
         <!-- Model Inputs Inspector (collapsible) -->
         <details class="brain-inputs-inspector">
-          <summary class="card-title-eng clickable-summary">MODEL INPUTS INSPECTOR ▸</summary>
+          <summary class="card-title-eng clickable-summary">MODEL INPUTS INSPECTOR (80 FEATURES) ▸</summary>
           <div class="brain-inputs-grid" id="brain-inputs-grid">
             <div class="proba-placeholder">Run a prediction to inspect model inputs</div>
           </div>
@@ -1079,7 +1160,7 @@
       statusBadge.className = `sim-status-badge status-${(data.status || 'ready').toLowerCase()}`;
       statusBadge.textContent = data.status === 'RUNNING' ? '● RUNNING'
         : data.status === 'PAUSED' ? '❚❚ PAUSED'
-        : data.status === 'COMPLETED' ? '✔ COMPLETED' : '○ READY';
+          : data.status === 'COMPLETED' ? '✔ COMPLETED' : '○ READY';
     }
 
     const btnPlay = document.getElementById('btn-sim-play-pause');
@@ -1370,30 +1451,103 @@
    * Updates the Brain Shadow Mode section from the /api/brain/shadow-predict response.
    * Called periodically (~every 2s) when the simulation is running.
    */
-  function updateBrainShadowDom(brainData) {
-    if (!brainData) return;
+  function updateBrainShadowDom(brainData, simMsg) {
+    if (!brainData && !simMsg) return;
 
     const section = document.getElementById('sim-brain-shadow-section');
     if (!section) return;
 
-    // 1. Model status badge
+    // 0. Control Mode Buttons & Active Banner (Section 3, 4, 19)
+    const curMode = (simMsg && simMsg.control_mode) || 'BASELINE';
+    document.querySelectorAll('.btn-ctrl-mode').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-mode') === curMode);
+    });
+
+    const banner = document.getElementById('ai-control-banner');
+    if (banner) {
+      banner.style.display = curMode === 'AI_CONTROL' ? 'flex' : 'none';
+    }
+
+    const modeBadge = document.getElementById('brain-active-badge');
+    if (modeBadge) {
+      modeBadge.textContent = `MODE: ${curMode}`;
+      modeBadge.style.color = curMode === 'AI_CONTROL' ? '#3fb950' : (curMode === 'SHADOW' ? '#d29922' : '#8b949e');
+    }
+
+    const pathBadge = document.getElementById('brain-path-badge');
+    if (pathBadge && simMsg && simMsg.control_path) {
+      pathBadge.textContent = `CONTROL: ${simMsg.control_path}`;
+    }
+
+    // 1. Model status & authority
     const statusBadge = document.getElementById('brain-status-badge');
     if (statusBadge) {
-      const st = brainData.status || 'UNAVAILABLE';
+      const st = (simMsg && simMsg.model_status) || (brainData && brainData.status) || 'READY';
       statusBadge.textContent = st;
       statusBadge.className = `brain-status-badge brain-st-${st.toLowerCase()}`;
     }
 
-    // 2. Prediction vs Simulator comparison
-    const pred = brainData.prediction || {};
-    const sim = brainData.simulator || {};
-    const comp = brainData.comparison || {};
+    const authEl = document.getElementById('ctrl-authority');
+    if (authEl) {
+      authEl.textContent = (simMsg && simMsg.control_authority) || (curMode === 'AI_CONTROL' ? 'HVEAC BRAIN v1' : 'SIMULATOR OPTIMIZER');
+      authEl.style.color = curMode === 'AI_CONTROL' ? '#58a6ff' : '#d29922';
+    }
 
-    const aiSetEl = document.getElementById('brain-ai-setpoint');
-    if (aiSetEl) {
-      aiSetEl.textContent = pred.ai_setpoint_c != null
-        ? `${pred.ai_setpoint_c.toFixed(1)} °C`
-        : '—';
+    const govStatusEl = document.getElementById('ctrl-safety-status');
+    if (govStatusEl && simMsg && simMsg.safety_status) {
+      govStatusEl.textContent = simMsg.safety_status;
+    }
+
+    // 2. Setpoint Cards (Track separately: AI Requested, Safety Governor, Applied, Baseline)
+    const pred = (brainData && brainData.prediction) || {};
+    const sim = (brainData && brainData.simulator) || {};
+    const comp = (brainData && brainData.comparison) || {};
+
+    const reqVal = (simMsg && simMsg.ai_requested_setpoint_c != null)
+      ? simMsg.ai_requested_setpoint_c
+      : pred.ai_setpoint_c;
+    const reqEl = document.getElementById('ctrl-ai-requested');
+    if (reqEl) reqEl.textContent = reqVal != null ? `${reqVal.toFixed(1)} °C` : '—';
+
+    const safeVal = (simMsg && simMsg.ai_safe_setpoint_c != null)
+      ? simMsg.ai_safe_setpoint_c
+      : reqVal;
+    const safeEl = document.getElementById('ctrl-ai-safe');
+    if (safeEl) safeEl.textContent = safeVal != null ? `${safeVal.toFixed(1)} °C` : '—';
+
+    const safeTagEl = document.getElementById('ctrl-safety-status-tag');
+    if (safeTagEl && simMsg && simMsg.safety_status) {
+      safeTagEl.textContent = simMsg.safety_status;
+    }
+
+    const safeReasonEl = document.getElementById('ctrl-safety-reason');
+    if (safeReasonEl && simMsg && simMsg.safety_reason) {
+      safeReasonEl.textContent = simMsg.safety_reason;
+    }
+
+    const appliedVal = (simMsg && simMsg.ai_applied_setpoint_c != null)
+      ? simMsg.ai_applied_setpoint_c
+      : (curMode === 'AI_CONTROL' ? safeVal : (sim.setpoint_c != null ? sim.setpoint_c : 22.5));
+    const appliedEl = document.getElementById('ctrl-ai-applied');
+    if (appliedEl) appliedEl.textContent = appliedVal != null ? `${appliedVal.toFixed(1)} °C` : '—';
+
+    const appliedModeEl = document.getElementById('ctrl-applied-mode');
+    if (appliedModeEl) {
+      appliedModeEl.textContent = curMode === 'AI_CONTROL' ? 'AI (SAFE)' : 'BASELINE';
+    }
+
+    const baseVal = (simMsg && simMsg.baseline_setpoint_c != null)
+      ? simMsg.baseline_setpoint_c
+      : (sim.setpoint_c != null ? sim.setpoint_c : 22.5);
+    const baseEl = document.getElementById('ctrl-baseline-sp');
+    if (baseEl) baseEl.textContent = baseVal != null ? `${baseVal.toFixed(1)} °C` : '—';
+
+    const deltaVal = (simMsg && simMsg.setpoint_difference_c != null)
+      ? simMsg.setpoint_difference_c
+      : (appliedVal != null && baseVal != null ? (appliedVal - baseVal) : 0.0);
+    const deltaEl = document.getElementById('ctrl-delta-val');
+    if (deltaEl) {
+      deltaEl.textContent = `Δ ${deltaVal > 0 ? '+' : ''}${deltaVal.toFixed(1)} °C`;
     }
 
     const confEl = document.getElementById('brain-confidence');
@@ -1403,35 +1557,61 @@
         : '— %';
     }
 
-    const simSetEl = document.getElementById('brain-sim-setpoint');
-    if (simSetEl) {
-      simSetEl.textContent = sim.setpoint_c != null
-        ? `${sim.setpoint_c.toFixed(1)} °C`
-        : '—';
-    }
-
-    const simActEl = document.getElementById('brain-sim-action');
-    if (simActEl) simActEl.textContent = sim.action || '—';
-
     const agreeEl = document.getElementById('brain-agreement');
     if (agreeEl) {
-      if (comp.agreement === true) {
-        agreeEl.textContent = '✓ AGREE';
-        agreeEl.className = 'bcc-agreement agree-yes';
-      } else if (comp.agreement === false) {
-        agreeEl.textContent = '✗ DISAGREE';
-        agreeEl.className = 'bcc-agreement agree-no';
-      } else {
-        agreeEl.textContent = '—';
-        agreeEl.className = 'bcc-agreement';
+      const isAgree = Math.abs(deltaVal) < 0.25;
+      agreeEl.textContent = isAgree ? '✓ AGREE' : '≠ DELTA';
+      agreeEl.className = isAgree ? 'bcc-agreement agree-yes' : 'bcc-agreement agree-no';
+    }
+
+    // 3. Live Performance Comparison (Section 21)
+    if (simMsg && simMsg.ai_control && simMsg.ai_control.metrics) {
+      const m = simMsg.ai_control.metrics;
+      if (m.baseline && m.ai_control) {
+        const bEnergy = document.getElementById('comp-base-energy');
+        if (bEnergy) bEnergy.textContent = `${m.baseline.total_cooling_energy_kwh.toFixed(2)} kWh`;
+        const aEnergy = document.getElementById('comp-ai-energy');
+        if (aEnergy) aEnergy.textContent = `${m.ai_control.total_cooling_energy_kwh.toFixed(2)} kWh`;
+
+        const dEnergy = document.getElementById('comp-energy-delta');
+        if (dEnergy && m.comparison) {
+          const pct = m.comparison.energy_delta_pct;
+          dEnergy.textContent = `${pct > 0 ? '+' : ''}${pct.toFixed(1)}% Simulated Result`;
+          dEnergy.style.color = pct <= 0 ? '#3fb950' : '#f85149';
+        }
+
+        const bComfort = document.getElementById('comp-base-comfort');
+        if (bComfort) bComfort.textContent = `${m.baseline.comfort_band_pct.toFixed(1)}%`;
+        const aComfort = document.getElementById('comp-ai-comfort');
+        if (aComfort) aComfort.textContent = `${m.ai_control.comfort_band_pct.toFixed(1)}%`;
+
+        const bChanges = document.getElementById('comp-base-changes');
+        if (bChanges) bChanges.textContent = `${m.baseline.setpoint_changes ?? 0}`;
+        const aChanges = document.getElementById('comp-ai-changes');
+        if (aChanges) aChanges.textContent = `${m.ai_control.setpoint_changes ?? 0}`;
+
+        const interEl = document.getElementById('comp-interventions');
+        if (interEl && m.governor) {
+          interEl.textContent = `Rate: ${m.governor.rate_limit_count} | Dwell: ${m.governor.dwell_hold_count} | Fallback: ${m.governor.fallback_count}`;
+        }
       }
     }
 
-    const devEl = document.getElementById('brain-deviation');
-    if (devEl) {
-      devEl.textContent = comp.deviation_c != null
-        ? `Deviation: ${comp.deviation_c.toFixed(1)} °C`
-        : 'Deviation: —';
+    // 4. Compact Control Decision Event Log (Section 27)
+    if (simMsg && simMsg.ai_control && simMsg.ai_control.recent_events) {
+      const events = simMsg.ai_control.recent_events;
+      const logContainer = document.getElementById('ctrl-events-log');
+      if (logContainer && events.length > 0) {
+        logContainer.innerHTML = events.slice(-8).map(e => `
+          <div class="log-entry">
+            <span class="log-time">${e.time || '00:00:00'}</span>
+            <span class="log-req">AI REQ: ${e.ai_requested_c != null ? e.ai_requested_c.toFixed(1) : '—'}°C</span>
+            <span class="log-app">APPLIED: ${e.applied_c != null ? e.applied_c.toFixed(1) : '—'}°C</span>
+            <span class="log-st st-${(e.status || 'applied').toLowerCase()}">${e.status || 'APPLIED'}</span>
+            <span class="log-rs">${e.reason || ''}</span>
+          </div>
+        `).join('');
+      }
     }
 
     // 3. Class Probability Distribution bars
@@ -1460,18 +1640,23 @@
       probaContainer.innerHTML = html;
     }
 
-    // 4. Trend history chart
+    // 4. Trend history chart (record once per simulation step)
     if (pred.ai_setpoint_c != null && sim.setpoint_c != null) {
       const ctx = brainData.simulation_context || {};
-      _brainTrendHistory.push({
-        time: ctx.simulation_time_seconds || 0,
-        ai: pred.ai_setpoint_c,
-        sim: sim.setpoint_c,
-      });
-      if (_brainTrendHistory.length > _brainTrendMaxPoints) {
-        _brainTrendHistory.splice(0, _brainTrendHistory.length - _brainTrendMaxPoints);
+      const curStep = ctx.step_index != null ? ctx.step_index : Math.floor((ctx.simulation_time_seconds || 0) / 10);
+      const lastPoint = _brainTrendHistory[_brainTrendHistory.length - 1];
+      if (!lastPoint || lastPoint.step !== curStep) {
+        _brainTrendHistory.push({
+          time: ctx.simulation_time_seconds || 0,
+          step: curStep,
+          ai: pred.ai_setpoint_c,
+          sim: sim.setpoint_c,
+        });
+        if (_brainTrendHistory.length > _brainTrendMaxPoints) {
+          _brainTrendHistory.splice(0, _brainTrendHistory.length - _brainTrendMaxPoints);
+        }
+        _renderBrainTrendChart();
       }
-      _renderBrainTrendChart();
     }
 
     // 5. Diagnostics / Feature warnings
@@ -1485,6 +1670,15 @@
       } else {
         warningsEl.innerHTML = '<div class="brain-ok-tag">✓ All 80 features mapped</div>';
       }
+    }
+
+    // 6. Inference latency
+    const latEl = document.getElementById('brain-latency-val');
+    if (latEl) {
+      const diag = brainData.diagnostics || {};
+      latEl.textContent = diag.inference_latency_ms != null
+        ? `${diag.inference_latency_ms.toFixed(1)} ms`
+        : '—';
     }
   }
 
@@ -1599,6 +1793,11 @@
    */
   function clearBrainTrendHistory() {
     _brainTrendHistory.length = 0;
+    const canvas = document.getElementById('brain-trend-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
   }
 
   window.HVEAC_PAGES = {

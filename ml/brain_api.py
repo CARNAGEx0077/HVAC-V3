@@ -127,4 +127,11 @@ async def shadow_predict():
 async def reset_adapter():
     """Reset the feature adapter's rolling history (e.g. after scenario change)."""
     _adapter.reset()
+    try:
+        from backend.simulation.manager import _get_shadow_predictor
+        shadow = _get_shadow_predictor()
+        if shadow is not None:
+            shadow.reset()
+    except Exception:
+        pass
     return {"status": "ok", "message": "Feature adapter history cleared"}

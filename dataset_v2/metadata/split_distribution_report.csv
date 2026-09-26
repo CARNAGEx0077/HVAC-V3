@@ -1,0 +1,42 @@
+dimension,metric,train,validation,test
+Metadata,scenario_count,70,15,15
+Metadata,row_count,50400,10800,10800
+Family,FAMILY_1,14,3,3
+Family,FAMILY_2,14,3,3
+Family,FAMILY_3,14,3,3
+Family,FAMILY_4,14,3,3
+Family,FAMILY_5,14,3,3
+Target Setpoint Proportion,22.0°C,0.0043,0.0,0.0
+Target Setpoint Proportion,22.5°C,0.007,0.0006,0.0
+Target Setpoint Proportion,23.0°C,0.0447,0.0697,0.0544
+Target Setpoint Proportion,23.5°C,0.1742,0.1751,0.1468
+Target Setpoint Proportion,24.0°C,0.3833,0.3857,0.4008
+Target Setpoint Proportion,24.5°C,0.3275,0.3094,0.3376
+Target Setpoint Proportion,25.0°C,0.059,0.0594,0.0605
+Thermal,mean_room_temp,24.03,24.05,23.92
+Thermal,mean_temp_gradient,2.26,2.59,2.54
+Thermal,mean_heat_load_watts,6191.2,6286.2,6205.9
+Occupancy,mean_occupancy,16.41,16.53,15.93
+Occupancy,max_occupancy,36,26,26
+Compute,mean_cpu,44.91,45.93,45.35
+Compute,mean_gpu,38.35,37.77,39.51
+Compute,mean_comp_heat_watts,2146.8,2147.2,2183.1
+Environment,mean_outdoor_temp_c,38.29,38.8,38.12
+Environment,mean_humidity_percent,56.97,58.32,57.61
+Label Reason Proportion,STATE_A_OVERHEATING_COOLING,0.2673,0.2812,0.288
+Label Reason Proportion,STATE_B_ENERGY_OPTIMIZED,0.2435,0.2727,0.2671
+Label Reason Proportion,HIGH_OCCUPANCY,0.2631,0.2372,0.1943
+Label Reason Proportion,HIGH_COMPUTE_LOAD,0.1855,0.1516,0.1893
+Label Reason Proportion,STATE_B_COMFORT_ENERGY_BALANCE,0.0268,0.0,0.0605
+Label Reason Proportion,LOCALIZED_ZONE_COOLING,0.0111,0.0552,0.0
+Label Reason Proportion,STATE_D_PREVENTIVE_COOLING,0.0015,0.0012,0.0009
+Label Reason Proportion,STATE_E_PREVENTIVE_WARMING,0.0012,0.0009,0.0
+Regime Proportion,REGIME_A_HOT_RISING,0.0018,0.0008,0.001
+Regime Proportion,REGIME_B_HOT_STABLE,0.2256,0.2463,0.243
+Regime Proportion,REGIME_C_COMFORTABLE_STABLE,0.6753,0.6673,0.6604
+Regime Proportion,REGIME_D_COOLING_FALLING,0.0959,0.0849,0.0953
+Regime Proportion,REGIME_E_LOW_TEMP_LOW_COOLING,0.0,0.0,0.0
+Regime Proportion,REGIME_F_HIGH_COMPUTE,0.2167,0.2,0.2181
+Regime Proportion,REGIME_G_HIGH_OCCUPANCY,0.2429,0.2,0.2667
+Regime Proportion,REGIME_H_LOCALIZED_HOTSPOT,0.7366,0.7724,0.8046
+Regime Proportion,REGIME_I_OPPOSING_ZONES,0.2,0.2,0.2

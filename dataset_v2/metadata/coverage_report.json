@@ -1,0 +1,125 @@
+{
+  "total_rows_analyzed": 72000,
+  "scenario_family_distribution": {
+    "FAMILY_1": 14400,
+    "FAMILY_2": 14400,
+    "FAMILY_3": 14400,
+    "FAMILY_4": 14400,
+    "FAMILY_5": 14400
+  },
+  "label_reason_distribution": {
+    "STATE_A_OVERHEATING_COOLING": 19618,
+    "STATE_B_ENERGY_OPTIMIZED": 18102,
+    "HIGH_COMPUTE_LOAD": 13031,
+    "HIGH_OCCUPANCY": 17922,
+    "STATE_D_PREVENTIVE_COOLING": 98,
+    "LOCALIZED_ZONE_COOLING": 1157,
+    "STATE_E_PREVENTIVE_WARMING": 69,
+    "STATE_B_COMFORT_ENERGY_BALANCE": 2003
+  },
+  "metrics_summary": {
+    "occupancy": {
+      "min": 0.0,
+      "p25": 12.0,
+      "median": 15.0,
+      "mean": 16.36,
+      "p75": 19.0,
+      "max": 36.0,
+      "std": 6.5
+    },
+    "cpu_utilization_percent": {
+      "min": 3.0,
+      "p25": 19.79,
+      "median": 40.12,
+      "mean": 49.76,
+      "p75": 87.0,
+      "max": 98.0,
+      "std": 33.27
+    },
+    "gpu_utilization_percent": {
+      "min": 0.0,
+      "p25": 9.44,
+      "median": 22.4,
+      "mean": 43.15,
+      "p75": 86.8,
+      "max": 98.0,
+      "std": 37.7
+    },
+    "outdoor_temperature_c": {
+      "min": 32.06,
+      "p25": 36.19,
+      "median": 38.63,
+      "mean": 38.34,
+      "p75": 40.54,
+      "max": 42.0,
+      "std": 2.64
+    },
+    "humidity_percent": {
+      "min": 45.0,
+      "p25": 50.74,
+      "median": 57.31,
+      "mean": 57.27,
+      "p75": 62.4,
+      "max": 77.6,
+      "std": 7.94
+    },
+    "room_average_temperature_c": {
+      "min": 22.5,
+      "p25": 23.32,
+      "median": 23.93,
+      "mean": 24.02,
+      "p75": 24.57,
+      "max": 27.92,
+      "std": 0.91
+    },
+    "total_heat_load_watts": {
+      "min": 3637.9,
+      "p25": 5626.86,
+      "median": 6137.43,
+      "mean": 6207.67,
+      "p75": 6929.82,
+      "max": 8317.05,
+      "std": 973.34
+    },
+    "optimal_room_setpoint_c": {
+      "min": 22.0,
+      "p25": 24.0,
+      "median": 24.0,
+      "mean": 24.07,
+      "p75": 24.5,
+      "max": 25.0,
+      "std": 0.5
+    }
+  },
+  "optimal_setpoint_breakdown": {
+    "22.0": {
+      "count": 217,
+      "percent": 0.3
+    },
+    "22.5": {
+      "count": 359,
+      "percent": 0.5
+    },
+    "23.0": {
+      "count": 3591,
+      "percent": 4.99
+    },
+    "23.5": {
+      "count": 12258,
+      "percent": 17.03
+    },
+    "24.0": {
+      "count": 27815,
+      "percent": 38.63
+    },
+    "24.5": {
+      "count": 23494,
+      "percent": 32.63
+    },
+    "25.0": {
+      "count": 4266,
+      "percent": 5.92
+    }
+  },
+  "concentration_warnings": []
+}

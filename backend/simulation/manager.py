@@ -3,6 +3,11 @@ Simulation Manager for HVEAC V3 Control Center.
 
 Coordinates scenario playback, variable speed control (1x, 5x, 10x, 30x),
 real-time state transitions, and WebSocket broadcast streaming.
+
+Includes HVEAC Brain V1 shadow prediction integration:
+- AI predictions are generated on each simulation step change
+- Results are included in the WebSocket broadcast for frontend display
+- Shadow mode is OBSERVATION ONLY — no HVAC control path exists
 """
 
 import asyncio
@@ -18,6 +23,21 @@ from simulator.room import FIXED_COMPUTERS, FIXED_AC_UNITS
 from simulator.scenarios import ALL_SCENARIOS
 
 logger = logging.getLogger("hveac.simulation")
+
+# Lazy-load shadow predictor to avoid blocking startup if ML deps are missing
+_shadow_predictor = None
+
+def _get_shadow_predictor():
+    """Lazy-initialize the shadow predictor service."""
+    global _shadow_predictor
+    if _shadow_predictor is None:
+        try:
+            from ml.shadow_predictor import ShadowPredictor
+            _shadow_predictor = ShadowPredictor()
+            logger.info("[SIM] HVEAC Brain shadow predictor loaded")
+        except Exception as e:
+            logger.warning(f"[SIM] Shadow predictor unavailable: {e}")
+    return _shadow_predictor
 
 DATASET_DIR = Path("simulation_dataset")
 
@@ -82,8 +102,21 @@ class SimulationManager:
         self.timestep_seconds: float = 10.0
         self.duration_seconds: float = 7200.0
 
+        # Control Mode: BASELINE (default), SHADOW (allowed), AI_CONTROL (temporarily disabled pending audit)
+        self.control_mode: str = "BASELINE"
+        self.allowed_control_modes: List[str] = ["BASELINE", "SHADOW"]
+        self.disabled_control_modes: Dict[str, str] = {
+            "AI_CONTROL": "AI_CONTROL is temporarily DISABLED pending thermal control audit"
+        }
+
         # In-memory cached scenario datasets: {scenario_id: [record, ...]}
         self._scenario_data: Dict[int, List[Dict[str, Any]]] = {}
+        # In-memory cached AI-controlled scenario datasets
+        self._ai_scenario_data: Dict[int, List[Dict[str, Any]]] = {}
+        # Closed-loop evaluation metrics and recent events
+        self._closed_loop_metrics: Dict[str, Any] = {}
+        self._scenario_events: Dict[int, List[Dict[str, Any]]] = {1: [], 2: [], 3: [], 4: [], 5: []}
+
         self._connected_sockets: Set[WebSocket] = set()
         self._playback_task: Optional[asyncio.Task] = None
         self._lock = asyncio.Lock()
@@ -93,6 +126,7 @@ class SimulationManager:
 
     def _load_or_generate_datasets(self):
         """Loads pre-generated scenario records into memory for zero-latency replay."""
+        import csv
         DATASET_DIR.mkdir(parents=True, exist_ok=True)
         config = SimulationEngineConfig()
         engine = ScenarioEngine(config)
@@ -123,6 +157,55 @@ class SimulationManager:
                 logger.info(f"[SIM GEN] Generated and cached Scenario {sid}: {len(records)} records")
 
             self._scenario_data[sid] = records
+
+            # Also load AI-controlled scenario dataset if available
+            ai_file = DATASET_DIR / f"scenario_{sid}_ai.jsonl"
+            ai_records: List[Dict[str, Any]] = []
+            if ai_file.exists():
+                try:
+                    with open(ai_file, "r", encoding="utf-8") as f:
+                        for line in f:
+                            if line.strip():
+                                ai_records.append(json.loads(line))
+                    logger.info(f"[SIM LOAD] Loaded AI Scenario {sid}: {len(ai_records)} records from {ai_file.name}")
+                except Exception as err:
+                    logger.warning(f"[SIM LOAD] Failed to parse {ai_file}: {err}")
+            self._ai_scenario_data[sid] = ai_records
+
+        # Load closed-loop metrics
+        metrics_file = Path("ml/reports/closed_loop_metrics.json")
+        if metrics_file.exists():
+            try:
+                with open(metrics_file, "r", encoding="utf-8") as f:
+                    self._closed_loop_metrics = json.load(f)
+                logger.info("[SIM LOAD] Loaded closed_loop_metrics.json")
+            except Exception as e:
+                logger.warning(f"[SIM LOAD] Failed to load closed_loop_metrics.json: {e}")
+
+        # Load control events
+        events_file = Path("ml/reports/control_events.csv")
+        if events_file.exists():
+            try:
+                with open(events_file, "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        try:
+                            sid = int(row.get("scenario_id", 1))
+                            if sid in self._scenario_events:
+                                self._scenario_events[sid].append({
+                                    "sim_time_s": float(row.get("sim_time_s", 0.0)),
+                                    "time": row.get("time", "00:00:00"),
+                                    "ai_requested_c": float(row.get("ai_requested_c", 25.5)),
+                                    "applied_c": float(row.get("applied_c", 25.5)),
+                                    "baseline_c": float(row.get("baseline_c", 22.5)),
+                                    "status": row.get("status", "APPLIED"),
+                                    "reason": row.get("reason", ""),
+                                })
+                        except (ValueError, TypeError):
+                            continue
+                logger.info(f"[SIM LOAD] Loaded control events: {sum(len(v) for v in self._scenario_events.values())} events")
+            except Exception as e:
+                logger.warning(f"[SIM LOAD] Failed to parse control_events.csv: {e}")
 
     # --------------------------------------------------------------------------
     # WebSocket Client Subscription
@@ -164,10 +247,17 @@ class SimulationManager:
 
     def build_update_payload(self) -> Dict[str, Any]:
         """Constructs machine-readable simulation snapshot for frontend visualization."""
-        records = self._scenario_data.get(self.scenario_id, [])
+        if self.control_mode == "AI_CONTROL" and self.scenario_id in self._ai_scenario_data and self._ai_scenario_data[self.scenario_id]:
+            records = self._ai_scenario_data[self.scenario_id]
+        else:
+            records = self._scenario_data.get(self.scenario_id, [])
+
+        base_records = self._scenario_data.get(self.scenario_id, [])
         max_steps = len(records)
         step = min(max(self.current_step_idx, 0), max(0, max_steps - 1))
         rec = records[step] if records else {}
+        base_step = min(max(self.current_step_idx, 0), max(0, len(base_records) - 1))
+        base_rec = base_records[base_step] if base_records else {}
 
         # 1. Computers array with trend tracking and thermal contribution
         computers = []
@@ -317,7 +407,7 @@ class SimulationManager:
 
         meta = SCENARIO_METADATA.get(self.scenario_id, {})
 
-        return {
+        payload = {
             "type": "simulation_update",
             "is_synthetic": True,
             "data_source": "HVEAC_SIMULATOR_V3",
@@ -346,6 +436,118 @@ class SimulationManager:
             "targets": targets,
         }
 
+        # ── HVEAC Brain Shadow Prediction ──
+        shadow = _get_shadow_predictor()
+        if shadow is not None:
+            try:
+                shadow.predict(payload)
+                payload["ai_shadow"] = shadow.get_full_shadow_state()
+            except Exception as e:
+                logger.debug(f"[SIM] Shadow prediction skipped: {e}")
+                payload["ai_shadow"] = {
+                    "enabled": True, "mode": "SHADOW",
+                    "status": "ERROR", "model_version": "hveac_brain_v1",
+                    "control_path": False, "error": str(e),
+                }
+        else:
+            payload["ai_shadow"] = {
+                "enabled": False, "mode": "SHADOW",
+                "status": "UNAVAILABLE", "model_version": "hveac_brain_v1",
+                "control_path": False,
+            }
+
+        # ── Closed-Loop AI Control Fields (Sections 13, 17, 18, 26) ──
+        baseline_setpoint_c = float(base_rec.get("optimal_temperature_c", 22.5))
+
+        if self.control_mode == "AI_CONTROL":
+            ai_req = float(rec.get("ai_requested_setpoint_c", rec.get("optimal_temperature_c", 25.5)))
+            ai_safe = float(rec.get("ai_safe_setpoint_c", rec.get("optimal_temperature_c", 25.5)))
+            ai_applied = float(rec.get("ai_applied_setpoint_c", rec.get("optimal_temperature_c", 25.5)))
+            safety_status = str(rec.get("safety_status", "APPLIED"))
+            safety_reason = str(rec.get("safety_reason", "Safety Governor validated"))
+            control_authority = "HVEAC BRAIN v1"
+        elif self.control_mode == "SHADOW":
+            shadow_state = payload.get("ai_shadow", {})
+            pred_sp = shadow_state.get("predicted_setpoint_c")
+            ai_req = float(pred_sp) if pred_sp is not None else 25.5
+            ai_safe = ai_req
+            ai_applied = baseline_setpoint_c
+            safety_status = "OBSERVATION_ONLY"
+            safety_reason = "Shadow observation mode — baseline authoritative"
+            control_authority = "SIMULATOR OPTIMIZER"
+        else:  # BASELINE
+            ai_req = None
+            ai_safe = None
+            ai_applied = baseline_setpoint_c
+            safety_status = "BASELINE_OPTIMIZER"
+            safety_reason = "Simulator optimizer authoritative"
+            control_authority = "SIMULATOR OPTIMIZER"
+
+        sp_diff = round(ai_applied - baseline_setpoint_c, 2) if ai_applied is not None else 0.0
+
+        # Section 18 WebSocket & REST telemetry fields
+        payload["control_mode"] = self.control_mode
+        payload["control_path"] = "SIMULATOR_ONLY"
+        payload["control_authority"] = control_authority
+        payload["ai_requested_setpoint_c"] = ai_req
+        payload["ai_safe_setpoint_c"] = ai_safe
+        payload["ai_applied_setpoint_c"] = ai_applied
+        payload["baseline_setpoint_c"] = baseline_setpoint_c
+        payload["setpoint_difference_c"] = sp_diff
+        payload["safety_status"] = safety_status
+        payload["safety_reason"] = safety_reason
+        payload["model_status"] = "READY"
+        payload["model_version"] = "hveac_brain_v1"
+
+        # Bounded recent control events up to current simulation time
+        events = self._scenario_events.get(self.scenario_id, [])
+        recent_events = [
+            e for e in events if e.get("sim_time_s", 0) <= self.sim_time_seconds
+        ][-15:]
+
+        scenario_metrics = self._closed_loop_metrics.get("scenarios", {}).get(str(self.scenario_id), {})
+
+        payload["ai_control"] = {
+            "mode": self.control_mode,
+            "control_path": "SIMULATOR_ONLY",
+            "control_authority": control_authority,
+            "requested_setpoint_c": ai_req,
+            "safe_setpoint_c": ai_safe,
+            "applied_setpoint_c": ai_applied,
+            "baseline_setpoint_c": baseline_setpoint_c,
+            "difference_c": sp_diff,
+            "safety_status": safety_status,
+            "safety_reason": safety_reason,
+            "recent_events": recent_events,
+            "metrics": scenario_metrics,
+        }
+
+        return payload
+
+    async def set_control_mode(self, mode: str) -> Dict[str, Any]:
+        """Switches simulation control mode (BASELINE, SHADOW, AI_CONTROL)."""
+        mode_upper = mode.upper().strip()
+        if mode_upper not in self.allowed_control_modes:
+            raise ValueError(f"Invalid control mode '{mode}'. Allowed modes: {self.allowed_control_modes}")
+
+        async with self._lock:
+            old_mode = self.control_mode
+            self.control_mode = mode_upper
+            logger.info(f"[SIM CONTROL] Mode transition: {old_mode} -> {self.control_mode}")
+
+            # Reset shadow predictor rolling history
+            shadow = _get_shadow_predictor()
+            if shadow is not None:
+                shadow.reset()
+
+        await self.broadcast_update()
+        return {
+            "status": "success",
+            "control_mode": self.control_mode,
+            "previous_mode": old_mode,
+            "control_path": "SIMULATOR_ONLY",
+        }
+
     # --------------------------------------------------------------------------
     # Playback Lifecycle Management
     # --------------------------------------------------------------------------
@@ -360,6 +562,10 @@ class SimulationManager:
             self.current_step_idx = 0
             self.sim_time_seconds = 0.0
             self.status = "READY"
+            # Reset shadow predictor rolling history for new scenario
+            shadow = _get_shadow_predictor()
+            if shadow is not None:
+                shadow.reset()
             logger.info(f"[SIM] Selected Scenario {scenario_id}: {SCENARIO_METADATA[scenario_id]['name']}")
 
         await self.broadcast_update()
@@ -399,6 +605,10 @@ class SimulationManager:
             self.current_step_idx = 0
             self.sim_time_seconds = 0.0
             self.status = "READY"
+            # Reset shadow predictor rolling history
+            shadow = _get_shadow_predictor()
+            if shadow is not None:
+                shadow.reset()
             logger.info(f"[SIM] Reset Scenario {self.scenario_id} to t=0.")
 
         await self.broadcast_update()

@@ -1,0 +1,62 @@
+{
+  "AGGRESSIVE_COOLING": {
+    "row_count": 3230,
+    "accuracy": 0.374,
+    "mae_deg_c": 0.4017,
+    "pct_within_0_5_c": 82.26,
+    "status": "WARNING"
+  },
+  "LOWER_TARGET_LE_23_0C": {
+    "row_count": 587,
+    "accuracy": 0.0204,
+    "mae_deg_c": 0.9779,
+    "pct_within_0_5_c": 2.39,
+    "status": "WARNING"
+  },
+  "HIGH_THERMAL_LOAD_GT_3500W": {
+    "row_count": 10800,
+    "accuracy": 0.7414,
+    "mae_deg_c": 0.1558,
+    "pct_within_0_5_c": 94.69,
+    "status": "PASS"
+  },
+  "HOT_RISING": {
+    "row_count": 3110,
+    "accuracy": 0.5598,
+    "mae_deg_c": 0.3122,
+    "pct_within_0_5_c": 81.58,
+    "status": "WARNING"
+  },
+  "LOW_TEMPERATURE_LE_22_5C": {
+    "row_count": 0,
+    "status": "NO_TEST_ROWS"
+  },
+  "HIGH_COMPUTE_GT_3000W": {
+    "row_count": 2355,
+    "accuracy": 0.7002,
+    "mae_deg_c": 0.1499,
+    "pct_within_0_5_c": 100.0,
+    "status": "PASS"
+  },
+  "HIGH_OCCUPANCY_GE_20": {
+    "row_count": 2880,
+    "accuracy": 0.9917,
+    "mae_deg_c": 0.0042,
+    "pct_within_0_5_c": 100.0,
+    "status": "PASS"
+  },
+  "LOCALIZED_HOTSPOT_GE_1_5C": {
+    "row_count": 8690,
+    "accuracy": 0.6915,
+    "mae_deg_c": 0.1872,
+    "pct_within_0_5_c": 93.41,
+    "status": "PASS"
+  },
+  "OPPOSING_ZONES_FAMILY_5": {
+    "row_count": 2160,
+    "accuracy": 0.6898,
+    "mae_deg_c": 0.2877,
+    "pct_within_0_5_c": 73.47,
+    "status": "WARNING"
+  }
+}

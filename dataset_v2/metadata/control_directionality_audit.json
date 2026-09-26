@@ -1,0 +1,139 @@
+{
+  "unit_tests": {
+    "status": "PASS",
+    "tests": {
+      "TEST_A": {
+        "name": "Hot + Rising Trend Cooling Orientation",
+        "current_temp": 25.0,
+        "trend": "+0.35 C/min",
+        "optimal_target": 24.0,
+        "condition": "optimal_target <= 25.0",
+        "passed": true
+      },
+      "TEST_B": {
+        "name": "Comfortable + Stable Energy Optimization",
+        "current_temp": 24.0,
+        "trend": "0.0 C/min",
+        "optimal_target": 24.5,
+        "condition": "optimal_target >= 23.5",
+        "passed": true
+      },
+      "TEST_C": {
+        "name": "Cool Room No Cooling Escalation",
+        "current_temp": 23.0,
+        "trend": "0.0 C/min",
+        "optimal_target": 25.0,
+        "condition": "optimal_target >= 23.0",
+        "passed": true
+      },
+      "TEST_D": {
+        "name": "Severe Overheating Strong Cooling",
+        "current_temp": 27.0,
+        "trend": "+0.40 C/min",
+        "optimal_target": 23.0,
+        "cooling_level": 1.0,
+        "condition": "optimal_target <= 23.0 and cooling_level >= 0.50",
+        "passed": true
+      },
+      "TEST_E": {
+        "name": "Imminent Overheating Target Restriction",
+        "current_temp": 25.0,
+        "trend": "+0.40 C/min",
+        "optimal_target": 24.0,
+        "condition": "optimal_target <= 25.0 and optimal_target != 26.0",
+        "passed": true
+      },
+      "TEST_F": {
+        "name": "Overcooled Room Cooling Reduction",
+        "current_temp": 22.0,
+        "trend": "0.0 C/min",
+        "optimal_target": 25.5,
+        "cooling_level": 0.05,
+        "condition": "optimal_target >= 23.0 and cooling_level <= 0.20",
+        "passed": true
+      }
+    }
+  },
+  "monotonicity_sweep": {
+    "status": "PASS",
+    "temperature_monotonic": true,
+    "load_monotonic": true,
+    "temperature_sweep": [
+      {
+        "temp": 21.0,
+        "setpoint": 25.5,
+        "cooling": 0.05
+      },
+      {
+        "temp": 22.0,
+        "setpoint": 25.5,
+        "cooling": 0.05
+      },
+      {
+        "temp": 23.0,
+        "setpoint": 25.0,
+        "cooling": 0.05
+      },
+      {
+        "temp": 24.0,
+        "setpoint": 24.5,
+        "cooling": 0.05
+      },
+      {
+        "temp": 25.0,
+        "setpoint": 24.0,
+        "cooling": 0.55
+      },
+      {
+        "temp": 26.0,
+        "setpoint": 24.0,
+        "cooling": 1.0
+      },
+      {
+        "temp": 27.0,
+        "setpoint": 23.5,
+        "cooling": 1.0
+      },
+      {
+        "temp": 28.0,
+        "setpoint": 23.0,
+        "cooling": 1.0
+      }
+    ],
+    "load_sweep": [
+      {
+        "load_w": 800.0,
+        "setpoint": 24.0,
+        "cooling": 0.375
+      },
+      {
+        "load_w": 1600.0,
+        "setpoint": 24.0,
+        "cooling": 0.375
+      },
+      {
+        "load_w": 2400.0,
+        "setpoint": 24.0,
+        "cooling": 0.375
+      },
+      {
+        "load_w": 3200.0,
+        "setpoint": 24.0,
+        "cooling": 0.375
+      },
+      {
+        "load_w": 4000.0,
+        "setpoint": 24.0,
+        "cooling": 0.375
+      }
+    ]
+  },
+  "dataset_audit": {
+    "status": "PASS",
+    "total_rows_audited": 72000,
+    "violations_hot_warming": 0,
+    "violations_overcooled_escalation": 0,
+    "sample_cases": []
+  },
+  "overall_directionality_status": "PASS"
+}

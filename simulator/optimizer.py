@@ -52,17 +52,42 @@ class HvacTargetOptimizer:
         current_temperatures: Dict[str, float],
         zone_disturbance_heat_w: Dict[str, float],
         dt_seconds: float = 60.0,
+        target_temperature_c: Optional[float] = None,
     ) -> OptimalHvacTarget:
         """
         Solves for optimal continuous cooling vector u = [u1, u2, u3, u4] in [0, 1]^4
         minimizing multi-objective loss function J(u).
         """
-        t_current = np.array([current_temperatures[z] for z in ZONE_IDS], dtype=float)
-        q_dist = np.array([zone_disturbance_heat_w.get(z, 0.0) for z in ZONE_IDS], dtype=float)
+        t_current = np.array([current_temperatures.get(z, current_temperatures.get(z.lower(), 22.5)) for z in ZONE_IDS], dtype=float)
+        q_dist = np.array([zone_disturbance_heat_w.get(z, zone_disturbance_heat_w.get(z.lower(), 0.0)) for z in ZONE_IDS], dtype=float)
 
-        t_target = self.opt.target_temperature_c
-        t_safe_max = self.opt.safe_max_temperature_c
-        t_safe_min = self.opt.safe_min_temperature_c
+        t_target = float(target_temperature_c) if target_temperature_c is not None else self.opt.target_temperature_c
+
+        # When target_temperature_c is explicitly specified (cooling thermostat control):
+        if target_temperature_c is not None:
+            is_cooling_mode = True
+            t_safe_max = max(self.opt.safe_max_temperature_c, t_target + 0.5)
+            t_safe_min = min(self.opt.safe_min_temperature_c, t_target - 2.5)
+
+            # Physical thermostat logic:
+            # If all zones are currently at or below the cooling target setpoint, no cooling is required.
+            excess_temp = np.maximum(0.0, t_current - t_target)
+            if np.all(excess_temp <= 0.0):
+                t_pred_free = t_current + (q_dist * dt_seconds) / self.c_zone
+                return OptimalHvacTarget(
+                    optimal_cooling_ac1=0.0,
+                    optimal_cooling_ac2=0.0,
+                    optimal_cooling_ac3=0.0,
+                    optimal_cooling_ac4=0.0,
+                    optimal_temperature_c=round(t_target, 2),
+                    optimal_hvac_action="ALL_OFF",
+                    predicted_next_avg_temp=round(float(np.mean(t_pred_free)), 3),
+                    objective_cost=0.0,
+                )
+        else:
+            is_cooling_mode = False
+            t_safe_max = self.opt.safe_max_temperature_c
+            t_safe_min = self.opt.safe_min_temperature_c
 
         w_comfort = self.opt.w_comfort
         w_penalty = self.opt.w_safety_penalty
@@ -79,8 +104,12 @@ class HvacTargetOptimizer:
             # Predicted temperature forward lookahead
             t_pred = t_current + (q_net_zone * dt_seconds) / self.c_zone
 
-            # 1. Comfort deviation from 22.5 C
-            loss_comfort = np.sum((t_pred - t_target) ** 2)
+            # 1. Comfort deviation from target
+            if is_cooling_mode:
+                # Cooling-only thermostat: only penalize when temperature exceeds cooling target
+                loss_comfort = np.sum(np.maximum(0.0, t_pred - t_target) ** 2)
+            else:
+                loss_comfort = np.sum((t_pred - t_target) ** 2)
 
             # 2. Overheating and overcooling penalties (one-sided quadratic)
             overheat = np.maximum(0.0, t_pred - t_safe_max)
@@ -131,7 +160,7 @@ class HvacTargetOptimizer:
             optimal_cooling_ac2=round(float(u_opt[1]), 3),
             optimal_cooling_ac3=round(float(u_opt[2]), 3),
             optimal_cooling_ac4=round(float(u_opt[3]), 3),
-            optimal_temperature_c=round(self.opt.target_temperature_c, 2),
+            optimal_temperature_c=round(t_target, 2),
             optimal_hvac_action=action_name,
             predicted_next_avg_temp=round(next_avg, 3),
             objective_cost=round(obj_cost, 4),

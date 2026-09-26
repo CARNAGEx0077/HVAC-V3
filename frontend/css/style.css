@@ -2608,8 +2608,375 @@ html, body {
   border-bottom: 1px solid var(--border-subtle);
 }
 
+/* ── Feature Inspector Grouped Display ─────────────────────────────────── */
+.fi-group {
+  margin-bottom: 10px;
+}
+
+.fi-group-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 4px;
+  grid-column: 1 / -1;
+}
+
+.fi-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-size: 11px;
+}
+
+.fi-row:hover {
+  background: rgba(139, 148, 158, 0.04);
+}
+
+.fi-name {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fi-val {
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 11px;
+  text-align: right;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.fi-unit {
+  color: var(--text-dim);
+  font-size: 9px;
+  margin-left: 3px;
+  min-width: 20px;
+}
+
+/* ── Inference Latency Badge ──────────────────────────────────────────── */
+.brain-latency-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  background: rgba(139, 148, 158, 0.06);
+  border: 1px solid var(--border-subtle);
+  border-radius: 3px;
+}
+
+.brain-latency-badge .lat-val {
+  color: var(--text-muted);
+}
+
 @media (max-width: 1000px) {
   .brain-comparison-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ── Closed-Loop Control Mode Selector & Banner ────────────────────────── */
+.sim-ctrl-mode-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-raised, #161b22);
+  border: 1px solid var(--border-subtle, #30363d);
+  border-radius: 4px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+}
+
+.ctrl-mode-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-dim, #8b949e);
+  text-transform: uppercase;
+}
+
+.ctrl-mode-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-ctrl-mode {
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  background: var(--surface, #0d1117);
+  color: var(--text-muted, #8b949e);
+  border: 1px solid var(--border-subtle, #30363d);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-ctrl-mode:hover {
+  color: var(--text, #c9d1d9);
+  border-color: var(--border, #6e7681);
+}
+
+.btn-ctrl-mode.active {
+  color: #58a6ff;
+  background: rgba(56, 139, 253, 0.12);
+  border-color: #388bfd;
+}
+
+.btn-ctrl-mode.active[data-mode="AI_CONTROL"] {
+  color: #3fb950;
+  background: rgba(63, 185, 80, 0.12);
+  border-color: #238636;
+}
+
+.ai-control-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(56, 139, 253, 0.08);
+  border: 1px solid rgba(56, 139, 253, 0.3);
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.banner-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 2px;
+  background: #238636;
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.banner-note {
+  font-size: 11px;
+  color: var(--text-muted, #8b949e);
+  line-height: 1.4;
+}
+
+.brain-4grid {
+  grid-template-columns: repeat(4, 1fr) !important;
+}
+
+@media (max-width: 1024px) {
+  .brain-4grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+.bcc-tag-gov {
+  color: #d29922;
+  background: rgba(210, 153, 34, 0.1);
+  border: 1px solid rgba(210, 153, 34, 0.2);
+}
+
+.bcc-tag-applied {
+  color: #3fb950;
+  background: rgba(63, 185, 80, 0.1);
+  border: 1px solid rgba(63, 185, 80, 0.2);
+}
+
+.brain-applied-card {
+  border-color: rgba(63, 185, 80, 0.3) !important;
+}
+
+.brain-path-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #79c0ff;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  background: rgba(56, 139, 253, 0.1);
+  border: 1px solid rgba(56, 139, 253, 0.25);
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+}
+
+/* ── Live Performance Comparison Table ─────────────────────────────────── */
+.brain-perf-comparison {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--surface, #0d1117);
+  border: 1px solid var(--border-subtle, #30363d);
+  border-radius: 4px;
+}
+
+.perf-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 10px;
+}
+
+@media (max-width: 1024px) {
+  .perf-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.pm-box {
+  padding: 10px 12px;
+  background: var(--surface-raised, #161b22);
+  border: 1px solid var(--border-subtle, #30363d);
+  border-radius: 3px;
+}
+
+.pm-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-dim, #8b949e);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.pm-vals {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text, #c9d1d9);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 4px;
+}
+
+.pm-base {
+  color: #d29922;
+}
+
+.pm-ai {
+  color: #58a6ff;
+}
+
+.pm-delta {
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  color: #3fb950;
+}
+
+.pm-sub {
+  font-size: 10px;
+  color: var(--text-dim, #8b949e);
+}
+
+/* ── Compact Event Log ─────────────────────────────────────────────────── */
+.brain-event-log-section {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--surface, #0d1117);
+  border: 1px solid var(--border-subtle, #30363d);
+  border-radius: 4px;
+}
+
+.compact-event-log {
+  margin-top: 10px;
+  max-height: 140px;
+  overflow-y: auto;
+  border: 1px solid var(--border-subtle, #30363d);
+  border-radius: 3px;
+  background: #090d13;
+  padding: 6px 8px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 11px;
+}
+
+.log-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(48, 54, 61, 0.4);
+}
+
+.log-entry:last-child {
+  border-bottom: none;
+}
+
+.log-time {
+  color: var(--text-dim, #8b949e);
+  font-size: 10px;
+  width: 65px;
+  flex-shrink: 0;
+}
+
+.log-req {
+  color: #58a6ff;
+  font-weight: 600;
+  width: 105px;
+  flex-shrink: 0;
+}
+
+.log-app {
+  color: #3fb950;
+  font-weight: 600;
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.log-st {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.log-st.st-applied {
+  color: #3fb950;
+  background: rgba(63, 185, 80, 0.12);
+}
+
+.log-st.st-rate_limited {
+  color: #d29922;
+  background: rgba(210, 153, 34, 0.12);
+}
+
+.log-st.st-hysteresis_hold {
+  color: #8b949e;
+  background: rgba(139, 148, 158, 0.12);
+}
+
+.log-st.st-fallback_baseline {
+  color: #f85149;
+  background: rgba(248, 81, 73, 0.12);
+}
+
+.log-rs {
+  color: var(--text-muted, #8b949e);
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-row-empty {
+  color: var(--text-dim, #8b949e);
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
 }

@@ -1,0 +1,6 @@
+scenario_family,family,scenario_count,row_count,accuracy,balanced_accuracy,macro_f1,mae_deg_c,pct_within_0_50_c,pct_within_0_5_c,directional_correctness_pct
+FAMILY_1,FAMILY_1,3,2160,0.6625,0.605,0.5006,0.1688,100.0,100.0,100.0
+FAMILY_2,FAMILY_2,3,2160,0.6884,0.6578,0.5605,0.1558,100.0,100.0,100.0
+FAMILY_3,FAMILY_3,3,2160,0.6731,0.6701,0.5765,0.1634,100.0,100.0,100.0
+FAMILY_4,FAMILY_4,3,2160,0.9931,0.9901,0.9588,0.0035,100.0,100.0,100.0
+FAMILY_5,FAMILY_5,3,2160,0.6898,0.6345,0.5972,0.2877,73.47,73.47,100.0

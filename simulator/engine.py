@@ -36,14 +36,96 @@ class ScenarioEngine:
             self.config.physics,
         )
 
+    def _build_step_snapshot(
+        self,
+        scenario: BaseScenario,
+        step_idx: int,
+        t_sec: float,
+        comp_states: List[Any],
+        occ_state: Any,
+        env_state: Any,
+        current_temperatures: Dict[str, float],
+        baseline_target: Any,
+    ) -> Dict[str, Any]:
+        """Constructs a state dictionary matching FeatureAdapter requirements."""
+        zone_temps = {
+            "zone_1": current_temperatures["ZONE_1"],
+            "zone_2": current_temperatures["ZONE_2"],
+            "zone_3": current_temperatures["ZONE_3"],
+            "zone_4": current_temperatures["ZONE_4"],
+        }
+        temps_list = list(zone_temps.values())
+        avg_temp = sum(temps_list) / len(temps_list)
+
+        occupancy = {
+            "total": occ_state.total_occupancy,
+            "zones": {
+                "zone_1": occ_state.zone_occupancy["ZONE_1"],
+                "zone_2": occ_state.zone_occupancy["ZONE_2"],
+                "zone_3": occ_state.zone_occupancy["ZONE_3"],
+                "zone_4": occ_state.zone_occupancy["ZONE_4"],
+            },
+        }
+
+        computers = [
+            {
+                "id": c.computer_id,
+                "cpu_util_percent": c.cpu_utilization_percent,
+                "gpu_util_percent": c.gpu_utilization_percent,
+                "workload_category": c.workload_category,
+                "heat_watts": c.synthetic_heat_w,
+            }
+            for c in comp_states
+        ]
+
+        acs = []
+        for ac_id in ("AC-1", "AC-2", "AC-3", "AC-4"):
+            unit = self.hvac_model._units[ac_id]
+            acs.append({
+                "id": ac_id,
+                "wall": unit["wall"],
+                "state": unit["state"],
+                "cooling_level": unit["cooling_level"],
+                "setpoint_c": unit["setpoint_c"],
+            })
+
+        return {
+            "scenario_id": scenario.scenario_id,
+            "scenario_name": scenario.name,
+            "simulation_time_seconds": t_sec,
+            "step_index": step_idx,
+            "occupancy": occupancy,
+            "environment": {
+                "outdoor_temperature_c": env_state.outdoor_temperature_c,
+                "humidity_percent": env_state.relative_humidity_percent,
+                "solar_irradiance_w_m2": env_state.solar_irradiance_w_m2,
+            },
+            "hvac": {"acs": acs},
+            "thermal": {
+                "zone_temperatures_c": zone_temps,
+                "room_average_temperature_c": avg_temp,
+                "minimum_temperature_c": min(temps_list),
+                "maximum_temperature_c": max(temps_list),
+                "temperature_difference_c": max(temps_list) - min(temps_list),
+            },
+            "computers": computers,
+            "targets": {
+                "optimal_temperature_c": baseline_target.optimal_temperature_c,
+                "optimal_hvac_action": baseline_target.optimal_hvac_action,
+            },
+        }
+
     def run_scenario(
         self,
         scenario: BaseScenario,
         run_idx: int = 0,
         seed: int = 42,
+        control_mode: str = "BASELINE",
+        ai_controller: Optional[Any] = None,
     ) -> List[Dict[str, Any]]:
         """
         Executes a complete scenario simulation run and returns list of flat records.
+        Supports both BASELINE mode and closed-loop AI_CONTROL mode through SafetyGovernor.
         """
         # Seed generator deterministically for this scenario and run
         # Seed formula: seed + (scenario_id * 10000) + (run_idx * 100)
@@ -59,6 +141,15 @@ class ScenarioEngine:
         num_timesteps = int(duration / dt)
 
         records: List[Dict[str, Any]] = []
+
+        # Lazy initialize AI controller if AI_CONTROL mode requested without controller instance
+        if control_mode == "AI_CONTROL" and ai_controller is None:
+            from ml.ai_controller import AiClosedLoopController
+            ai_controller = AiClosedLoopController()
+            ai_controller.set_control_mode("AI_CONTROL")
+
+        if ai_controller is not None and control_mode == "AI_CONTROL":
+            ai_controller.reset(initial_setpoint=init_temps.get("ZONE_1", 22.5))
 
         for step_idx in range(num_timesteps):
             t_sec = round(step_idx * dt, 1)
@@ -88,18 +179,80 @@ class ScenarioEngine:
             )
             env_state = self.environment_model.calculate_envelope_heat(self.thermal_model.temperatures)
 
-            # E. Apply current baseline HVAC controls & calculate delivered cooling
-            self.hvac_model.set_all_controls(
-                ts_input.hvac_cooling_levels,
-                ts_input.hvac_setpoints,
-            )
-            hvac_state = self.hvac_model.calculate_cooling_distribution()
-
-            # F. Total envelope heat by zone (transmission + solar)
+            # Total envelope heat by zone (transmission + solar)
             total_env_by_zone = {
                 z: round(env_state.zone_transmission_heat_w[z] + env_state.zone_solar_heat_w[z], 2)
                 for z in ZONE_IDS
             }
+
+            # Interzone heat transfer estimate
+            interzone_est = self.thermal_model.calculate_interzone_heat_transfer()
+            disturbance_heat_by_zone = {
+                z: round(
+                    comp_heat_by_zone[z]
+                    + occ_state.zone_heat_watts[z]
+                    + total_env_by_zone[z]
+                    + interzone_est[z],
+                    2,
+                )
+                for z in ZONE_IDS
+            }
+
+            # Parallel baseline reference calculation
+            baseline_target = self.optimizer.optimize_action(
+                current_temperatures=self.thermal_model.temperatures,
+                zone_disturbance_heat_w=disturbance_heat_by_zone,
+                dt_seconds=60.0,
+            )
+
+            # E. Determine HVAC controls based on control mode
+            safety_res = None
+            if control_mode == "AI_CONTROL" and ai_controller is not None:
+                sim_snapshot = self._build_step_snapshot(
+                    scenario=scenario,
+                    step_idx=step_idx,
+                    t_sec=t_sec,
+                    comp_states=comp_states,
+                    occ_state=occ_state,
+                    env_state=env_state,
+                    current_temperatures=self.thermal_model.temperatures,
+                    baseline_target=baseline_target,
+                )
+
+                safety_res = ai_controller.execute_control_cycle(
+                    sim_state=sim_snapshot,
+                    baseline_setpoint_c=baseline_target.optimal_temperature_c,
+                    hvac_available=True,
+                )
+
+                # Realize safe setpoint through existing simulator optimizer
+                if safety_res.status == "FALLBACK_BASELINE":
+                    hvac_levels = ts_input.hvac_cooling_levels
+                    hvac_setpoints = ts_input.hvac_setpoints
+                    optimal_target = baseline_target
+                else:
+                    applied_sp = safety_res.applied_setpoint_c
+                    ai_opt = self.optimizer.optimize_action(
+                        current_temperatures=self.thermal_model.temperatures,
+                        zone_disturbance_heat_w=disturbance_heat_by_zone,
+                        dt_seconds=60.0,
+                        target_temperature_c=applied_sp,
+                    )
+                    hvac_levels = {
+                        "AC-1": ai_opt.optimal_cooling_ac1,
+                        "AC-2": ai_opt.optimal_cooling_ac2,
+                        "AC-3": ai_opt.optimal_cooling_ac3,
+                        "AC-4": ai_opt.optimal_cooling_ac4,
+                    }
+                    hvac_setpoints = {ac_id: applied_sp for ac_id in ("AC-1", "AC-2", "AC-3", "AC-4")}
+                    optimal_target = ai_opt
+            else:
+                hvac_levels = ts_input.hvac_cooling_levels
+                hvac_setpoints = ts_input.hvac_setpoints
+                optimal_target = baseline_target
+
+            self.hvac_model.set_all_controls(hvac_levels, hvac_setpoints)
+            hvac_state = self.hvac_model.calculate_cooling_distribution()
 
             # G. Advance thermal dynamic state
             thermal_state = self.thermal_model.step(
@@ -110,24 +263,22 @@ class ScenarioEngine:
                 hvac_cooling_by_zone=hvac_state.zone_cooling_w,
             )
 
-            # H. Total disturbance heat currently acting on zones (excluding HVAC cooling)
-            disturbance_heat_by_zone = {
-                z: round(
-                    comp_heat_by_zone[z]
-                    + occ_state.zone_heat_watts[z]
-                    + total_env_by_zone[z]
-                    + thermal_state.zone_interzone_heat_w[z],
-                    2,
+            # Record closed loop metrics if in AI_CONTROL
+            if control_mode == "AI_CONTROL" and ai_controller is not None and safety_res is not None:
+                ai_controller.metrics.record_step(
+                    ai_setpoint=safety_res.ai_requested_setpoint_c,
+                    safe_setpoint=safety_res.safe_setpoint_c,
+                    applied_setpoint=safety_res.applied_setpoint_c,
+                    baseline_setpoint=baseline_target.optimal_temperature_c,
+                    room_avg_temp=thermal_state.room_average_temperature,
+                    max_zone_temp=thermal_state.max_zone_temperature,
+                    min_zone_temp=thermal_state.min_zone_temperature,
+                    gradient=thermal_state.temperature_gradient,
+                    total_cooling_w=hvac_state.total_cooling_w,
+                    avg_cooling_level=sum(hvac_levels.values()) / max(1, len(hvac_levels)),
+                    dt_seconds=dt,
+                    total_latency_ms=safety_res.validation_latency_ms,
                 )
-                for z in ZONE_IDS
-            }
-
-            # I. Compute optimal target control action for future ML training
-            optimal_target = self.optimizer.optimize_action(
-                current_temperatures=thermal_state.zone_temperatures,
-                zone_disturbance_heat_w=disturbance_heat_by_zone,
-                dt_seconds=60.0,
-            )
 
             # J. Assemble flat, fully-formed record
             rec: Dict[str, Any] = {
@@ -223,6 +374,16 @@ class ScenarioEngine:
             rec["optimal_temperature_c"] = optimal_target.optimal_temperature_c
             rec["optimal_hvac_action"] = optimal_target.optimal_hvac_action
             rec["target_objective_cost"] = optimal_target.objective_cost
+
+            # Closed-loop AI control fields
+            if control_mode == "AI_CONTROL" and safety_res is not None:
+                rec["control_mode"] = "AI_CONTROL"
+                rec["ai_requested_setpoint_c"] = safety_res.ai_requested_setpoint_c
+                rec["ai_safe_setpoint_c"] = safety_res.safe_setpoint_c
+                rec["ai_applied_setpoint_c"] = safety_res.applied_setpoint_c
+                rec["safety_status"] = safety_res.status
+                rec["safety_reason"] = safety_res.reason
+                rec["control_path"] = safety_res.control_path
 
             records.append(rec)
 

@@ -1,0 +1,81 @@
+feature,importance,physical_group
+maximum_temperature_c,0.114957,THERMAL STATE
+zone_1_temperature_c,0.101142,THERMAL STATE
+room_average_temperature_c,0.073387,THERMAL STATE
+room_temp_30s_avg,0.050067,HISTORY / TREND
+ac1_setpoint_c,0.035497,HVAC STATE
+zone_2_temperature_c,0.028645,THERMAL STATE
+zone_4_temperature_c,0.028218,THERMAL STATE
+comfort_penalty,0.028179,THERMAL STATE
+comfort_score,0.026881,THERMAL STATE
+temperature_difference_c,0.0262,THERMAL STATE
+total_hvac_cooling_watts,0.024049,HVAC STATE
+minimum_temperature_c,0.023009,THERMAL STATE
+ac4_setpoint_c,0.022183,HVAC STATE
+total_heat_load_watts,0.019259,OTHER
+hvac_cooling_30s_avg,0.018773,HISTORY / TREND
+occupancy_total,0.016321,OCCUPANCY
+outdoor_temperature_c,0.015526,THERMAL STATE
+zone_3_temperature_c,0.015369,THERMAL STATE
+ac1_cooling_level,0.014033,HVAC STATE
+ac2_cooling_level,0.013158,HVAC STATE
+humidity_percent,0.011929,ENVIRONMENT
+total_occupancy_heat_watts,0.011449,OCCUPANCY
+total_environmental_heat_watts,0.011109,ENVIRONMENT
+ac4_cooling_level,0.010919,HVAC STATE
+gpu_util_30s_avg,0.010449,HISTORY / TREND
+solar_load,0.009646,ENVIRONMENT
+ac3_cooling_level,0.009074,HVAC STATE
+total_computer_heat_watts,0.008835,COMPUTER LOAD
+cpu_util_30s_avg,0.008335,HISTORY / TREND
+computer_3_heat,0.007779,COMPUTER LOAD
+ac2_setpoint_c,0.007339,HVAC STATE
+computer_1_workload,0.007306,COMPUTER LOAD
+ac3_setpoint_c,0.007213,HVAC STATE
+occupancy_zone_1,0.00714,OCCUPANCY
+computer_1_heat,0.006825,COMPUTER LOAD
+computer_6_workload,0.006532,COMPUTER LOAD
+computer_3_workload,0.006192,COMPUTER LOAD
+occupancy_zone_3,0.006045,OCCUPANCY
+computer_1_cpu,0.005971,COMPUTER LOAD
+computer_4_workload,0.005638,COMPUTER LOAD
+computer_5_gpu,0.005263,COMPUTER LOAD
+computer_7_heat,0.005218,COMPUTER LOAD
+computer_2_gpu,0.00519,COMPUTER LOAD
+computer_4_cpu,0.005163,COMPUTER LOAD
+computer_4_heat,0.005098,COMPUTER LOAD
+computer_6_heat,0.005028,COMPUTER LOAD
+computer_1_gpu,0.005028,COMPUTER LOAD
+computer_6_gpu,0.004944,COMPUTER LOAD
+computer_2_heat,0.004758,COMPUTER LOAD
+computer_5_cpu,0.004752,COMPUTER LOAD
+computer_3_gpu,0.004496,COMPUTER LOAD
+computer_2_workload,0.004277,COMPUTER LOAD
+occupancy_zone_4,0.004183,OCCUPANCY
+ac1_state,0.004151,HVAC STATE
+computer_5_workload,0.003855,COMPUTER LOAD
+computer_8_workload,0.00384,COMPUTER LOAD
+computer_10_heat,0.003825,COMPUTER LOAD
+computer_8_gpu,0.003751,COMPUTER LOAD
+computer_6_cpu,0.003737,COMPUTER LOAD
+computer_9_workload,0.00371,COMPUTER LOAD
+occupancy_zone_2,0.003707,OCCUPANCY
+computer_9_heat,0.003592,COMPUTER LOAD
+computer_8_heat,0.003581,COMPUTER LOAD
+computer_2_cpu,0.003506,COMPUTER LOAD
+computer_3_cpu,0.003423,COMPUTER LOAD
+computer_5_heat,0.003384,COMPUTER LOAD
+computer_7_workload,0.003201,COMPUTER LOAD
+computer_9_gpu,0.003194,COMPUTER LOAD
+computer_10_workload,0.002802,COMPUTER LOAD
+computer_4_gpu,0.002741,COMPUTER LOAD
+computer_7_cpu,0.002643,COMPUTER LOAD
+computer_7_gpu,0.002573,COMPUTER LOAD
+computer_9_cpu,0.002265,COMPUTER LOAD
+computer_10_gpu,0.002094,COMPUTER LOAD
+computer_10_cpu,0.002074,COMPUTER LOAD
+computer_8_cpu,0.002009,COMPUTER LOAD
+ac3_state,0.00126,HVAC STATE
+ac2_state,0.001111,HVAC STATE
+ac4_state,0.0,HVAC STATE
+occupancy_total_30s_avg,0.0,OCCUPANCY

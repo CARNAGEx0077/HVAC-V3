@@ -1,0 +1,6 @@
+scenario_id,scenario_name,family,baseline_mean_temp_c,ai_mean_temp_c,baseline_comfort_pct,ai_comfort_pct,comfort_delta_pct,baseline_energy_kwh,ai_energy_kwh,energy_delta_kwh,energy_delta_pct,baseline_overheat_s,ai_overheat_s,baseline_setpoint_changes,ai_setpoint_changes,governor_rate_limits,governor_dwell_holds,governor_fallbacks,baseline_runtime_s,ai_runtime_s
+1,Localized Heavy Compute,F1 — Localized Compute,22.96,24.56,100.0,12.92,-87.08,7.0,6.2447,-0.7553,-10.79,0,0,0,8,8,35,0,1.59,55.49
+2,Occupancy Concentration,F2 — Occupancy Spike,22.4,24.28,100.0,15.69,-84.31,7.0,5.8106,-1.1894,-16.99,0,0,0,26,16,82,0,2.14,57.74
+3,Distributed Heavy Compute,F3 — Distributed Load,23.61,24.71,60.97,11.53,-49.44,8.4,8.4747,0.0747,0.89,810.0,310.0,0,7,8,35,0,1.19,53.62
+4,High Occupancy / Low Compute,F4 — High Occupancy,23.54,24.78,63.61,13.47,-50.14,7.0,6.8026,-0.1974,-2.82,620.0,5760.0,0,28,10,91,0,1.02,51.31
+5,Opposing Thermal Zones,F5 — Opposing Zones,24.31,24.64,44.58,13.19,-31.39,7.0,8.0627,1.0627,15.18,2670.0,0,0,9,9,39,0,3.37,53.57

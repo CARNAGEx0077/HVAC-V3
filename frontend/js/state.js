@@ -75,6 +75,7 @@
       stepIndex: 0,
       totalSteps: 720,
       pitchMode: false,
+      controlMode: 'BASELINE',
       scenarios: [],
       comparisons: [],
       selectedComputerId: null,
@@ -364,6 +365,28 @@
     }
   }
 
+  async function setSimulationControlMode(mode) {
+    try {
+      const resp = await fetch('/api/simulation/control-mode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ control_mode: mode })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        setState(s => ({
+          ...s,
+          simulation: {
+            ...s.simulation,
+            controlMode: data.control_mode
+          }
+        }));
+      }
+    } catch (e) {
+      console.error('[HVEAC Sim] Error setting control mode:', e);
+    }
+  }
+
   function togglePitchMode() {
     setState(s => ({
       ...s,
@@ -396,6 +419,7 @@
     pauseSimulation,
     resetSimulation,
     setSimulationSpeed,
+    setSimulationControlMode,
     fetchSimulationComparison,
     togglePitchMode,
     selectSimulationComputer,

@@ -1,0 +1,231 @@
+{
+  "evaluated_scenarios": 5,
+  "scenarios": {
+    "1": {
+      "name": "Localized Heavy Compute",
+      "family": "F1 \u2014 Localized Compute",
+      "baseline": {
+        "mean_room_temp_c": 22.96,
+        "max_room_temp_c": 25.86,
+        "min_room_temp_c": 21.87,
+        "mean_gradient_c": 2.29,
+        "comfort_band_pct": 100.0,
+        "overheating_time_s": 0,
+        "overcooling_time_s": 0,
+        "total_cooling_energy_kwh": 7.0,
+        "avg_cooling_watts": 3500.0,
+        "avg_cooling_level": 0.25,
+        "setpoint_changes": 0
+      },
+      "ai_control": {
+        "mean_room_temp_c": 24.56,
+        "max_room_temp_c": 25.28,
+        "min_room_temp_c": 22.31,
+        "mean_gradient_c": 0.86,
+        "comfort_band_pct": 12.92,
+        "overheating_time_s": 0,
+        "overcooling_time_s": 0,
+        "total_cooling_energy_kwh": 6.2447,
+        "avg_cooling_watts": 3122.3,
+        "avg_cooling_level": 0.223,
+        "setpoint_changes": 8
+      },
+      "governor": {
+        "applied_count": 9,
+        "rate_limit_count": 8,
+        "dwell_hold_count": 35,
+        "fallback_count": 0,
+        "total_decisions": 52,
+        "rate_limited_pct": 15.38,
+        "fallback_pct": 0.0,
+        "control_path": "SIMULATOR_ONLY"
+      },
+      "comparison": {
+        "energy_delta_kwh": -0.7553,
+        "energy_delta_pct": -10.79,
+        "comfort_delta_pct": -87.08
+      }
+    },
+    "2": {
+      "name": "Occupancy Concentration",
+      "family": "F2 \u2014 Occupancy Spike",
+      "baseline": {
+        "mean_room_temp_c": 22.4,
+        "max_room_temp_c": 25.84,
+        "min_room_temp_c": 21.25,
+        "mean_gradient_c": 3.13,
+        "comfort_band_pct": 100.0,
+        "overheating_time_s": 0,
+        "overcooling_time_s": 0,
+        "total_cooling_energy_kwh": 7.0,
+        "avg_cooling_watts": 3500.0,
+        "avg_cooling_level": 0.25,
+        "setpoint_changes": 0
+      },
+      "ai_control": {
+        "mean_room_temp_c": 24.28,
+        "max_room_temp_c": 25.38,
+        "min_room_temp_c": 22.14,
+        "mean_gradient_c": 1.45,
+        "comfort_band_pct": 15.69,
+        "overheating_time_s": 0,
+        "overcooling_time_s": 0,
+        "total_cooling_energy_kwh": 5.8106,
+        "avg_cooling_watts": 2905.3,
+        "avg_cooling_level": 0.208,
+        "setpoint_changes": 26
+      },
+      "governor": {
+        "applied_count": 27,
+        "rate_limit_count": 16,
+        "dwell_hold_count": 82,
+        "fallback_count": 0,
+        "total_decisions": 125,
+        "rate_limited_pct": 12.8,
+        "fallback_pct": 0.0,
+        "control_path": "SIMULATOR_ONLY"
+      },
+      "comparison": {
+        "energy_delta_kwh": -1.1894,
+        "energy_delta_pct": -16.99,
+        "comfort_delta_pct": -84.31
+      }
+    },
+    "3": {
+      "name": "Distributed Heavy Compute",
+      "family": "F3 \u2014 Distributed Load",
+      "baseline": {
+        "mean_room_temp_c": 23.61,
+        "max_room_temp_c": 26.26,
+        "min_room_temp_c": 21.9,
+        "mean_gradient_c": 1.04,
+        "comfort_band_pct": 60.97,
+        "overheating_time_s": 810.0,
+        "overcooling_time_s": 0,
+        "total_cooling_energy_kwh": 8.4,
+        "avg_cooling_watts": 4200.0,
+        "avg_cooling_level": 0.3,
+        "setpoint_changes": 0
+      },
+      "ai_control": {
+        "mean_room_temp_c": 24.71,
+        "max_room_temp_c": 25.25,
+        "min_room_temp_c": 21.98,
+        "mean_gradient_c": 0.54,
+        "comfort_band_pct": 11.53,
+        "overheating_time_s": 310.0,
+        "overcooling_time_s": 0,
+        "total_cooling_energy_kwh": 8.4747,
+        "avg_cooling_watts": 4237.4,
+        "avg_cooling_level": 0.303,
+        "setpoint_changes": 7
+      },
+      "governor": {
+        "applied_count": 8,
+        "rate_limit_count": 8,
+        "dwell_hold_count": 35,
+        "fallback_count": 0,
+        "total_decisions": 51,
+        "rate_limited_pct": 15.69,
+        "fallback_pct": 0.0,
+        "control_path": "SIMULATOR_ONLY"
+      },
+      "comparison": {
+        "energy_delta_kwh": 0.0747,
+        "energy_delta_pct": 0.89,
+        "comfort_delta_pct": -49.44
+      }
+    },
+    "4": {
+      "name": "High Occupancy / Low Compute",
+      "family": "F4 \u2014 High Occupancy",
+      "baseline": {
+        "mean_room_temp_c": 23.54,
+        "max_room_temp_c": 25.47,
+        "min_room_temp_c": 21.93,
+        "mean_gradient_c": 0.31,
+        "comfort_band_pct": 63.61,
+        "overheating_time_s": 620.0,
+        "overcooling_time_s": 0,
+        "total_cooling_energy_kwh": 7.0,
+        "avg_cooling_watts": 3500.0,
+        "avg_cooling_level": 0.25,
+        "setpoint_changes": 0
+      },
+      "ai_control": {
+        "mean_room_temp_c": 24.78,
+        "max_room_temp_c": 25.17,
+        "min_room_temp_c": 21.99,
+        "mean_gradient_c": 0.11,
+        "comfort_band_pct": 13.47,
+        "overheating_time_s": 5760.0,
+        "overcooling_time_s": 0,
+        "total_cooling_energy_kwh": 6.8026,
+        "avg_cooling_watts": 3401.3,
+        "avg_cooling_level": 0.243,
+        "setpoint_changes": 28
+      },
+      "governor": {
+        "applied_count": 29,
+        "rate_limit_count": 10,
+        "dwell_hold_count": 91,
+        "fallback_count": 0,
+        "total_decisions": 130,
+        "rate_limited_pct": 7.69,
+        "fallback_pct": 0.0,
+        "control_path": "SIMULATOR_ONLY"
+      },
+      "comparison": {
+        "energy_delta_kwh": -0.1974,
+        "energy_delta_pct": -2.82,
+        "comfort_delta_pct": -50.14
+      }
+    },
+    "5": {
+      "name": "Opposing Thermal Zones",
+      "family": "F5 \u2014 Opposing Zones",
+      "baseline": {
+        "mean_room_temp_c": 24.31,
+        "max_room_temp_c": 27.45,
+        "min_room_temp_c": 21.7,
+        "mean_gradient_c": 1.11,
+        "comfort_band_pct": 44.58,
+        "overheating_time_s": 2670.0,
+        "overcooling_time_s": 0,
+        "total_cooling_energy_kwh": 7.0,
+        "avg_cooling_watts": 3500.0,
+        "avg_cooling_level": 0.25,
+        "setpoint_changes": 0
+      },
+      "ai_control": {
+        "mean_room_temp_c": 24.64,
+        "max_room_temp_c": 25.27,
+        "min_room_temp_c": 21.79,
+        "mean_gradient_c": 0.61,
+        "comfort_band_pct": 13.19,
+        "overheating_time_s": 0,
+        "overcooling_time_s": 0,
+        "total_cooling_energy_kwh": 8.0627,
+        "avg_cooling_watts": 4031.3,
+        "avg_cooling_level": 0.288,
+        "setpoint_changes": 9
+      },
+      "governor": {
+        "applied_count": 10,
+        "rate_limit_count": 9,
+        "dwell_hold_count": 39,
+        "fallback_count": 0,
+        "total_decisions": 58,
+        "rate_limited_pct": 15.52,
+        "fallback_pct": 0.0,
+        "control_path": "SIMULATOR_ONLY"
+      },
+      "comparison": {
+        "energy_delta_kwh": 1.0627,
+        "energy_delta_pct": 15.18,
+        "comfort_delta_pct": -31.39
+      }
+    }
+  },
+  "timestamp_utc": "2026-09-25T21:26:20Z"
+}

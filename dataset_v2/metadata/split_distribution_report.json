@@ -1,0 +1,215 @@
+{
+  "TRAIN": {
+    "scenario_count": 70,
+    "row_count": 50400,
+    "family_distribution": {
+      "FAMILY_1": 14,
+      "FAMILY_2": 14,
+      "FAMILY_3": 14,
+      "FAMILY_4": 14,
+      "FAMILY_5": 14
+    },
+    "target_distribution": {
+      "22.0": 0.0043,
+      "22.5": 0.007,
+      "23.0": 0.0447,
+      "23.5": 0.1742,
+      "24.0": 0.3833,
+      "24.5": 0.3275,
+      "25.0": 0.059
+    },
+    "cooling_summary": {
+      "mean_ac1": 0.3368,
+      "mean_ac2": 0.2694,
+      "mean_ac3": 0.2911,
+      "mean_ac4": 0.3767,
+      "max_cooling": 1.0,
+      "aggressive_cooling_prop": 0.2832
+    },
+    "thermal_summary": {
+      "mean_room_temp": 24.03,
+      "std_room_temp": 0.94,
+      "min_room_temp": 22.5,
+      "max_room_temp": 27.92,
+      "mean_temp_gradient": 2.26,
+      "mean_heat_load_watts": 6191.2,
+      "max_heat_load_watts": 8157.6
+    },
+    "occupancy_summary": {
+      "mean_occupancy": 16.41,
+      "max_occupancy": 36
+    },
+    "compute_summary": {
+      "mean_cpu": 44.91,
+      "mean_gpu": 38.35,
+      "mean_comp_heat_watts": 2146.8
+    },
+    "environment_summary": {
+      "mean_outdoor_temp_c": 38.29,
+      "mean_humidity_percent": 56.97
+    },
+    "label_reason_distribution": {
+      "STATE_A_OVERHEATING_COOLING": 0.2673,
+      "STATE_B_ENERGY_OPTIMIZED": 0.2435,
+      "HIGH_OCCUPANCY": 0.2631,
+      "HIGH_COMPUTE_LOAD": 0.1855,
+      "STATE_B_COMFORT_ENERGY_BALANCE": 0.0268,
+      "LOCALIZED_ZONE_COOLING": 0.0111,
+      "STATE_D_PREVENTIVE_COOLING": 0.0015,
+      "STATE_E_PREVENTIVE_WARMING": 0.0012
+    },
+    "directional_regime_distribution": {
+      "REGIME_A_HOT_RISING": 0.0018,
+      "REGIME_B_HOT_STABLE": 0.2256,
+      "REGIME_C_COMFORTABLE_STABLE": 0.6753,
+      "REGIME_D_COOLING_FALLING": 0.0959,
+      "REGIME_E_LOW_TEMP_LOW_COOLING": 0.0,
+      "REGIME_F_HIGH_COMPUTE": 0.2167,
+      "REGIME_G_HIGH_OCCUPANCY": 0.2429,
+      "REGIME_H_LOCALIZED_HOTSPOT": 0.7366,
+      "REGIME_I_OPPOSING_ZONES": 0.2
+    }
+  },
+  "VALIDATION": {
+    "scenario_count": 15,
+    "row_count": 10800,
+    "family_distribution": {
+      "FAMILY_1": 3,
+      "FAMILY_2": 3,
+      "FAMILY_3": 3,
+      "FAMILY_4": 3,
+      "FAMILY_5": 3
+    },
+    "target_distribution": {
+      "22.0": 0.0,
+      "22.5": 0.0006,
+      "23.0": 0.0697,
+      "23.5": 0.1751,
+      "24.0": 0.3857,
+      "24.5": 0.3094,
+      "25.0": 0.0594
+    },
+    "cooling_summary": {
+      "mean_ac1": 0.2947,
+      "mean_ac2": 0.3423,
+      "mean_ac3": 0.3568,
+      "mean_ac4": 0.3037,
+      "max_cooling": 1.0,
+      "aggressive_cooling_prop": 0.2643
+    },
+    "thermal_summary": {
+      "mean_room_temp": 24.05,
+      "std_room_temp": 0.9,
+      "min_room_temp": 22.6,
+      "max_room_temp": 27.79,
+      "mean_temp_gradient": 2.59,
+      "mean_heat_load_watts": 6286.2,
+      "max_heat_load_watts": 8317.0
+    },
+    "occupancy_summary": {
+      "mean_occupancy": 16.53,
+      "max_occupancy": 26
+    },
+    "compute_summary": {
+      "mean_cpu": 45.93,
+      "mean_gpu": 37.77,
+      "mean_comp_heat_watts": 2147.2
+    },
+    "environment_summary": {
+      "mean_outdoor_temp_c": 38.8,
+      "mean_humidity_percent": 58.32
+    },
+    "label_reason_distribution": {
+      "STATE_A_OVERHEATING_COOLING": 0.2812,
+      "STATE_B_ENERGY_OPTIMIZED": 0.2727,
+      "HIGH_OCCUPANCY": 0.2372,
+      "HIGH_COMPUTE_LOAD": 0.1516,
+      "STATE_B_COMFORT_ENERGY_BALANCE": 0.0,
+      "LOCALIZED_ZONE_COOLING": 0.0552,
+      "STATE_D_PREVENTIVE_COOLING": 0.0012,
+      "STATE_E_PREVENTIVE_WARMING": 0.0009
+    },
+    "directional_regime_distribution": {
+      "REGIME_A_HOT_RISING": 0.0008,
+      "REGIME_B_HOT_STABLE": 0.2463,
+      "REGIME_C_COMFORTABLE_STABLE": 0.6673,
+      "REGIME_D_COOLING_FALLING": 0.0849,
+      "REGIME_E_LOW_TEMP_LOW_COOLING": 0.0,
+      "REGIME_F_HIGH_COMPUTE": 0.2,
+      "REGIME_G_HIGH_OCCUPANCY": 0.2,
+      "REGIME_H_LOCALIZED_HOTSPOT": 0.7724,
+      "REGIME_I_OPPOSING_ZONES": 0.2
+    }
+  },
+  "TEST": {
+    "scenario_count": 15,
+    "row_count": 10800,
+    "family_distribution": {
+      "FAMILY_1": 3,
+      "FAMILY_2": 3,
+      "FAMILY_3": 3,
+      "FAMILY_4": 3,
+      "FAMILY_5": 3
+    },
+    "target_distribution": {
+      "22.0": 0.0,
+      "22.5": 0.0,
+      "23.0": 0.0544,
+      "23.5": 0.1468,
+      "24.0": 0.4008,
+      "24.5": 0.3376,
+      "25.0": 0.0605
+    },
+    "cooling_summary": {
+      "mean_ac1": 0.3617,
+      "mean_ac2": 0.2913,
+      "mean_ac3": 0.2378,
+      "mean_ac4": 0.3071,
+      "max_cooling": 1.0,
+      "aggressive_cooling_prop": 0.2991
+    },
+    "thermal_summary": {
+      "mean_room_temp": 23.92,
+      "std_room_temp": 0.76,
+      "min_room_temp": 22.77,
+      "max_room_temp": 27.61,
+      "mean_temp_gradient": 2.54,
+      "mean_heat_load_watts": 6205.9,
+      "max_heat_load_watts": 7954.5
+    },
+    "occupancy_summary": {
+      "mean_occupancy": 15.93,
+      "max_occupancy": 26
+    },
+    "compute_summary": {
+      "mean_cpu": 45.35,
+      "mean_gpu": 39.51,
+      "mean_comp_heat_watts": 2183.1
+    },
+    "environment_summary": {
+      "mean_outdoor_temp_c": 38.12,
+      "mean_humidity_percent": 57.61
+    },
+    "label_reason_distribution": {
+      "STATE_A_OVERHEATING_COOLING": 0.288,
+      "STATE_B_ENERGY_OPTIMIZED": 0.2671,
+      "HIGH_OCCUPANCY": 0.1943,
+      "HIGH_COMPUTE_LOAD": 0.1893,
+      "STATE_B_COMFORT_ENERGY_BALANCE": 0.0605,
+      "LOCALIZED_ZONE_COOLING": 0.0,
+      "STATE_D_PREVENTIVE_COOLING": 0.0009,
+      "STATE_E_PREVENTIVE_WARMING": 0.0
+    },
+    "directional_regime_distribution": {
+      "REGIME_A_HOT_RISING": 0.001,
+      "REGIME_B_HOT_STABLE": 0.243,
+      "REGIME_C_COMFORTABLE_STABLE": 0.6604,
+      "REGIME_D_COOLING_FALLING": 0.0953,
+      "REGIME_E_LOW_TEMP_LOW_COOLING": 0.0,
+      "REGIME_F_HIGH_COMPUTE": 0.2181,
+      "REGIME_G_HIGH_OCCUPANCY": 0.2667,
+      "REGIME_H_LOCALIZED_HOTSPOT": 0.8046,
+      "REGIME_I_OPPOSING_ZONES": 0.2
+    }
+  }
+}
